@@ -82,11 +82,11 @@
       image: 'assets/projects/bluetooth-shower-playground.png',
       kind: 'web',
       platform: 'INTERACTIVE WEB · CANVAS PHYSICS',
-      summary: '전원, 수압, 온도와 분사 방향을 직접 조절하며 파란 물줄기와 바닥 튀김을 가지고 노는 블루투스 샤워기 물리 놀이터.',
-      impact: '60fps 실시간 물리 인터랙션',
+      summary: '샤워 헤드를 360° 돌리고 수압·온도를 조절하며, 차오르는 파란 수면과 배수 캡, 네 겹의 물소리를 가지고 노는 블루투스 샤워기 물리 놀이터.',
+      impact: '360° 조준 · 4-Layer Web Audio',
       role: '제품 기획 · AI 협업 개발 · 배포',
       collaboration: true,
-      tags: ['Canvas Physics', 'Interaction', 'Bluetooth UI']
+      tags: ['Canvas Physics', 'Web Audio', '360° Control']
     },
     {
       id: 'hotdog-street-empire',
