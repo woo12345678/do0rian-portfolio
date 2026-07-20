@@ -63,6 +63,19 @@
       tags: ['Web App', 'Simulation', 'Data']
     },
     {
+      id: 'korea-atmosphere-live',
+      title: 'Korea Atmosphere Live',
+      url: 'https://woo12345678.github.io/korea-atmosphere-live/',
+      image: 'assets/projects/korea-atmosphere-live.png',
+      kind: 'web',
+      platform: 'WEB APP · LIVE ENVIRONMENT DATA',
+      summary: '전국 17개 시·도 대표 지점의 미세먼지, 기온, 강수와 날씨를 실시간 지도와 순위로 보여주는 환경 관제 웹앱.',
+      impact: '17개 지역 · 10분 자동 갱신',
+      role: '제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Live Data', 'Air Quality', 'Weather']
+    },
+    {
       id: 'hotdog-street-empire',
       title: 'Hotdog Street Empire',
       url: 'https://do0rian.itch.io/hotdog-street-empire',
