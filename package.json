@@ -1,0 +1,11 @@
+{
+  "name": "do0rian-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DOORIAN interactive game developer portfolio",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/portfolio.test.js"
+  },
+  "engines": { "node": ">=18" }
+}

@@ -1,0 +1,188 @@
+(function (root, factory) {
+  const projects = factory();
+  if (typeof module === 'object' && module.exports) module.exports = projects;
+  root.PORTFOLIO_PROJECTS = projects;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  return [
+    {
+      id: 'magic-brick',
+      title: 'Magic Brick: Strategic Breaker',
+      url: 'https://play.google.com/store/apps/details?id=com.DOORIAN.Magic_Brick',
+      image: 'assets/projects/magic-brick.png',
+      kind: 'mobile',
+      platform: 'GOOGLE PLAY · ANDROID',
+      featured: true,
+      index: '01',
+      summary: '각도를 계산하고 연쇄 파괴를 설계하는 끝없는 전략형 벽돌깨기.',
+      impact: '18,000+ DOWNLOADS',
+      role: '직접 기획 · 개발 · 출시',
+      narrative: '아이디어를 실제 제품으로 만들고, 스토어에 출시한 뒤 1.8만 다운로드까지 도달한 독립 개발 프로젝트.',
+      tags: ['Product Design', 'Game Development', 'Store Launch']
+    },
+    {
+      id: 'make-tteok',
+      title: "Let's Make Tteok!",
+      url: 'https://do0rian.itch.io/maketteok',
+      image: 'assets/projects/make-tteok.png',
+      kind: 'game',
+      platform: 'ITCH.IO · 2 PLAYER ARCADE',
+      featured: true,
+      index: '02',
+      summary: '완벽한 타이밍과 두 플레이어의 호흡이 필요한 협동 떡메치기 아케이드.',
+      impact: '2인 개발 · 인디게임 아케이드 제출',
+      role: '공동 기획 · 개발',
+      narrative: '한 화면에서 두 사람이 즉시 이해하고 함께 웃을 수 있는 타이밍 중심 플레이를 설계한 협업 프로젝트.',
+      tags: ['2 Player', 'Arcade', 'Co-op']
+    },
+    {
+      id: 'neon-dash-waves',
+      title: 'Neon Dash Survivor: Waves',
+      url: 'https://do0rian.itch.io/m5zkth',
+      image: 'assets/projects/neon-dash-waves.gif',
+      kind: 'ai',
+      platform: 'ITCH.IO · AI SPEED BUILD',
+      featured: true,
+      index: '03',
+      summary: '웨이브를 돌파하고 라운드마다 업그레이드를 선택하는 네온 생존 슈터.',
+      impact: 'AI 활용 · 1시간 만에 기획–개발–출시',
+      role: '기획 · 개발 · 배포',
+      narrative: 'AI를 제작 파이프라인에 연결해 60 minutes 안에 아이디어부터 공개 출시까지 완료하고, 실제 다운로드와 유저를 확보한 속도 실험.',
+      tags: ['AI Workflow', 'Rapid Prototyping', 'Survival']
+    },
+    {
+      id: 'lotto-signal-lab',
+      title: 'Lotto Signal Lab',
+      url: 'https://woo12345678.github.io/lotto-signal-lab/',
+      image: 'assets/projects/lotto-signal-lab.png',
+      kind: 'web',
+      platform: 'WEB APP · DATA + PHYSICS',
+      summary: '한국 로또 기록 분석, 백만 회 시뮬레이션, 45구 물리 추첨을 하나로 엮은 브라우저 연구실.',
+      impact: '1,000,000회 Worker 시뮬레이션',
+      role: '제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Web App', 'Simulation', 'Data']
+    },
+    {
+      id: 'hotdog-street-empire',
+      title: 'Hotdog Street Empire',
+      url: 'https://do0rian.itch.io/hotdog-street-empire',
+      image: 'assets/projects/hotdog-street-empire.png',
+      kind: 'game',
+      platform: 'ITCH.IO · TYCOON',
+      summary: '온도, 익힘, 신선도를 관리하며 노점을 핫도그 제국으로 키우는 스트리트 푸드 타이쿤.',
+      impact: '브라우저 공개 출시',
+      role: '기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Tycoon', 'Physics', 'Browser']
+    },
+    {
+      id: 'takoyaki-street-empire',
+      title: 'Takoyaki Street Empire',
+      url: 'https://do0rian.itch.io/takoyaki-street-empire',
+      image: 'assets/projects/takoyaki-street-empire.png',
+      kind: 'game',
+      platform: 'ITCH.IO · TYCOON',
+      summary: '작은 야시장 노점을 네 개 구역의 스트리트 푸드 제국으로 확장하는 타코야키 경영 게임.',
+      impact: '브라우저 공개 출시',
+      role: '기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Tycoon', 'Cooking', 'Browser']
+    },
+    {
+      id: 'raid-1945',
+      title: 'Raid 1945: Rival Skies',
+      url: 'https://do0rian.itch.io/raid-1945-rival-skies',
+      image: 'assets/projects/raid-1945.png',
+      kind: 'game',
+      platform: 'ITCH.IO · MULTIPLAYER',
+      summary: '1–4명의 파일럿이 경쟁하는 1945 스타일 멀티플레이 비행 슈터.',
+      impact: '1–4 Player',
+      role: '게임 개발 · 공개 배포',
+      tags: ['Multiplayer', 'Shooter', 'Arcade']
+    },
+    {
+      id: 'fart-millionaire',
+      title: 'FART MILLIONAIRE',
+      url: 'https://do0rian.itch.io/fart-millionaire',
+      image: 'assets/projects/fart-millionaire.png',
+      kind: 'game',
+      platform: 'ITCH.IO · COMEDY',
+      summary: 'Fart, Poo, and Win. 황당함을 자산으로 바꾸는 코미디 게임.',
+      impact: '브라우저 공개 출시',
+      role: '기획 · 개발 · 배포',
+      tags: ['Comedy', 'Casual', 'Browser']
+    },
+    {
+      id: 'neon-dash-survival',
+      title: 'Neon Dash Survival',
+      url: 'https://do0rian.itch.io/neon-dash-survival',
+      image: 'assets/projects/neon-dash-survival.png',
+      kind: 'game',
+      platform: 'ITCH.IO · ARCADE',
+      summary: '움직임과 조준, 순수한 반응 속도에 집중한 빠른 아케이드 생존 슈터.',
+      impact: 'Playable Web Build',
+      role: '기획 · 개발 · 배포',
+      tags: ['Arcade', 'Survival', 'Action']
+    },
+    {
+      id: 'neon-escape',
+      title: 'Neon Escape',
+      url: 'https://do0rian.itch.io/neon-escape-dash-survival-arcade',
+      image: 'assets/projects/neon-escape.png',
+      kind: 'game',
+      platform: 'ITCH.IO · SCORE ATTACK',
+      summary: '적 사이를 대시하고 빛나는 보석을 모아 최고 점수에 도전하는 네온 아케이드.',
+      impact: 'Playable Web Build',
+      role: '기획 · 개발 · 배포',
+      tags: ['Dash', 'Score Attack', 'Arcade']
+    },
+    {
+      id: 'speedy-mole',
+      title: 'Speedy Mole!',
+      url: 'https://do0rian.itch.io/speedy-mole-fast-reaction-click-game',
+      image: 'assets/projects/speedy-mole.png',
+      kind: 'game',
+      platform: 'ITCH.IO · REACTION',
+      summary: '짧은 순간의 판단과 클릭 속도를 시험하는 빠른 반응 게임.',
+      impact: 'Playable Web Build',
+      role: '기획 · 개발 · 배포',
+      tags: ['Reaction', 'Casual', 'Score']
+    },
+    {
+      id: 'neon-snake',
+      title: 'Neon Snake+ : Boost & Gates',
+      url: 'https://do0rian.itch.io/neon-snake-boost-gates',
+      image: 'assets/projects/neon-snake.png',
+      kind: 'game',
+      platform: 'ITCH.IO · CLASSIC REMIX',
+      summary: '부스트와 게이트 시스템으로 고전 스네이크의 속도감을 재구성한 게임.',
+      impact: 'Playable Web Build',
+      role: '기획 · 개발 · 배포',
+      tags: ['Classic Remix', 'Arcade', 'Neon']
+    },
+    {
+      id: 'balloon-aim',
+      title: 'Balloon Aim Trainer',
+      url: 'https://do0rian.itch.io/balloon-aim-trainer',
+      image: 'assets/projects/balloon-aim.png',
+      kind: 'game',
+      platform: 'ITCH.IO · AIM TRAINER',
+      summary: '떠오르는 풍선을 빠르고 정확하게 터뜨리는 조준 훈련 게임.',
+      impact: 'Playable Web Build',
+      role: '기획 · 개발 · 배포',
+      tags: ['Aim', 'Training', 'Casual']
+    },
+    {
+      id: 'python-galaxy',
+      title: 'Python Galaxy',
+      url: 'https://do0rian.itch.io/python-galaxy',
+      image: 'assets/projects/python-galaxy.png',
+      kind: 'game',
+      platform: 'ITCH.IO · PYTHON',
+      summary: 'Python으로 만든 은하계 게임 프로토타입.',
+      impact: 'Playable Build',
+      role: '개발 · 실험 · 배포',
+      tags: ['Python', 'Prototype', 'Space']
+    }
+  ];
+});
