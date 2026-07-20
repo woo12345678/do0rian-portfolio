@@ -76,6 +76,19 @@
       tags: ['Live Data', 'Air Quality', 'Weather']
     },
     {
+      id: 'bluetooth-shower-playground',
+      title: 'AQUA/BT — Bluetooth Shower',
+      url: 'https://woo12345678.github.io/bluetooth-shower-playground/',
+      image: 'assets/projects/bluetooth-shower-playground.png',
+      kind: 'web',
+      platform: 'INTERACTIVE WEB · CANVAS PHYSICS',
+      summary: '전원, 수압, 온도와 분사 방향을 직접 조절하며 파란 물줄기와 바닥 튀김을 가지고 노는 블루투스 샤워기 물리 놀이터.',
+      impact: '60fps 실시간 물리 인터랙션',
+      role: '제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Canvas Physics', 'Interaction', 'Bluetooth UI']
+    },
+    {
       id: 'hotdog-street-empire',
       title: 'Hotdog Street Empire',
       url: 'https://do0rian.itch.io/hotdog-street-empire',
