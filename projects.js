@@ -115,6 +115,19 @@
       tags: ['Particle Physics', 'Web Audio', 'Mobile Gesture']
     },
     {
+      id: 'mosquito-hunt',
+      title: 'ZZZAP! — Mosquito Hunt',
+      url: 'https://woo12345678.github.io/mosquito-hunt/',
+      image: 'assets/projects/mosquito-hunt.png',
+      kind: 'web',
+      platform: 'INTERACTIVE WEB GAME · REACTION',
+      summary: '손가락을 피해 곡선으로 도망치는 모기의 위치를 스테레오 날갯소리로 듣고, 찰싹 잡아 콤보와 보스 라운드를 돌파하는 웹 게임.',
+      impact: 'Spatial Buzz Audio · Evasion AI',
+      role: '제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Evasion AI', 'Spatial Audio', 'Touch Game']
+    },
+    {
       id: 'hotdog-street-empire',
       title: 'Hotdog Street Empire',
       url: 'https://do0rian.itch.io/hotdog-street-empire',
