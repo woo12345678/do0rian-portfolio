@@ -134,11 +134,24 @@
       image: 'assets/projects/character-vault.png',
       kind: 'web',
       platform: 'PERSONAL COLLECTION · DATA APP',
-      summary: '좋아하는 게임 캐릭터를 카드로 추가하고 뒤집어 보며, 검색·희귀도·즐겨찾기와 JSON 백업으로 관리하는 개인 캐릭터 아카이브.',
-      impact: 'Persistent Collection · JSON Backup',
+      summary: '원하는 게임 캐릭터를 Wikipedia 이미지·설명·출처 검색 또는 직접 이미지 업로드로 추가하고, 카드·즐겨찾기·JSON 백업으로 관리하는 개인 아카이브.',
+      impact: 'Search Import · Local Upload · JSON Backup',
       role: '제품 기획 · AI 협업 개발 · 배포',
       collaboration: true,
       tags: ['LocalStorage', 'Collection UI', 'Web Audio']
+    },
+    {
+      id: 'infinite-cat-desk',
+      title: 'CAT/DESK — Infinite Cat Desk',
+      url: 'https://woo12345678.github.io/infinite-cat-desk/',
+      image: 'assets/projects/infinite-cat-desk.png',
+      kind: 'web',
+      platform: 'INTERACTIVE WEB TOY · CAT PHYSICS',
+      summary: '고양이를 끝없이 불러 쓰다듬고 레이저로 유인하며, 컵·키보드·화분·종이를 밀어 생산성을 파괴하는 물리 책상 장난감.',
+      impact: '14 Active Cats · 60 FPS Storm',
+      role: '제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Cat Physics', 'Web Audio', 'Touch Toy']
     },
     {
       id: 'hotdog-street-empire',
