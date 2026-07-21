@@ -89,6 +89,19 @@
       tags: ['Canvas Physics', 'Web Audio', '360° Control']
     },
     {
+      id: 'cyber-air-conditioner',
+      title: 'CYBER/AC — Cyber Air Conditioner',
+      url: 'https://woo12345678.github.io/cyber-air-conditioner/',
+      image: 'assets/projects/cyber-air-conditioner.png',
+      kind: 'web',
+      platform: 'INTERACTIVE WEB TOY · CLIMATE PHYSICS',
+      summary: '루버를 드래그해 차가운 바람을 휘게 만들고, 온도·습도·팬·냉방 모드를 조절하며 화면을 얼려 깨뜨리는 쓸모없는 사이버 에어컨.',
+      impact: '4 Climate Modes · 5-Layer Web Audio',
+      role: '제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Canvas Physics', 'Web Audio', 'Interactive Toy']
+    },
+    {
       id: 'hotdog-street-empire',
       title: 'Hotdog Street Empire',
       url: 'https://do0rian.itch.io/hotdog-street-empire',
