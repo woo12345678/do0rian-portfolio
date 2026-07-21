@@ -128,6 +128,19 @@
       tags: ['Evasion AI', 'Spatial Audio', 'Touch Game']
     },
     {
+      id: 'character-vault',
+      title: 'CHAR/VAULT — Character Collection',
+      url: 'https://woo12345678.github.io/character-vault/',
+      image: 'assets/projects/character-vault.png',
+      kind: 'web',
+      platform: 'PERSONAL COLLECTION · DATA APP',
+      summary: '좋아하는 게임 캐릭터를 카드로 추가하고 뒤집어 보며, 검색·희귀도·즐겨찾기와 JSON 백업으로 관리하는 개인 캐릭터 아카이브.',
+      impact: 'Persistent Collection · JSON Backup',
+      role: '제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['LocalStorage', 'Collection UI', 'Web Audio']
+    },
+    {
       id: 'hotdog-street-empire',
       title: 'Hotdog Street Empire',
       url: 'https://do0rian.itch.io/hotdog-street-empire',
