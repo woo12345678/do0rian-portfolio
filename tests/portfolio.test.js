@@ -6,7 +6,7 @@ const projects = require('../projects.js');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 
-assert.strictEqual(projects.length, 17, '포트폴리오에는 현재 17개 공개 프로젝트가 있어야 합니다.');
+assert.strictEqual(projects.length, 18, '포트폴리오에는 현재 18개 공개 프로젝트가 있어야 합니다.');
 assert.strictEqual(new Set(projects.map(p => p.id)).size, projects.length, '프로젝트 ID는 고유해야 합니다.');
 projects.forEach(project => {
   ['id', 'title', 'url', 'image', 'kind', 'summary'].forEach(key => assert(project[key], `${project.id || 'project'}: ${key} 필드가 필요합니다.`));
@@ -24,6 +24,7 @@ assert(projects.some(p => p.url === 'https://woo12345678.github.io/lotto-signal-
 assert(projects.some(p => p.url === 'https://woo12345678.github.io/korea-atmosphere-live/'));
 assert(projects.some(p => p.url === 'https://woo12345678.github.io/bluetooth-shower-playground/'));
 assert(projects.some(p => p.url === 'https://woo12345678.github.io/cyber-air-conditioner/'));
+assert(projects.some(p => p.url === 'https://woo12345678.github.io/click-fireworks/'));
 assert(projects.some(p => p.url === 'https://do0rian.itch.io/hotdog-street-empire'));
 
 ['hero', 'selectedWork', 'projectArchive', 'process', 'about'].forEach(id => assert(html.includes(`id="${id}"`), `${id} 섹션이 필요합니다.`));

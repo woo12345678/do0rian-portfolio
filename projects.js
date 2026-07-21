@@ -102,6 +102,19 @@
       tags: ['Canvas Physics', 'Web Audio', 'Interactive Toy']
     },
     {
+      id: 'click-fireworks',
+      title: 'NIGHT/POP — Click Fireworks',
+      url: 'https://woo12345678.github.io/click-fireworks/',
+      image: 'assets/projects/click-fireworks.png',
+      kind: 'web',
+      platform: 'INTERACTIVE WEB TOY · FIREWORKS',
+      summary: '터치한 곳까지 로켓을 날리고, 드래그로 밤하늘에 네 가지 폭죽 패턴을 그리며 18발 자동 피날레를 즐기는 클릭 불꽃놀이.',
+      impact: '4 Burst Patterns · 18-Shot Finale',
+      role: '제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Particle Physics', 'Web Audio', 'Mobile Gesture']
+    },
+    {
       id: 'hotdog-street-empire',
       title: 'Hotdog Street Empire',
       url: 'https://do0rian.itch.io/hotdog-street-empire',
