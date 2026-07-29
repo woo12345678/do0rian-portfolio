@@ -50,6 +50,19 @@
       tags: ['AI Workflow', 'Rapid Prototyping', 'Survival']
     },
     {
+      id: 'ladybug-garden',
+      title: 'Ladybug Garden — Tilt Survivor',
+      url: 'https://woo12345678.github.io/ladybug-garden/',
+      image: 'assets/projects/ladybug-garden.png',
+      kind: 'game',
+      platform: 'PWA + ANDROID · TILT SURVIVAL',
+      summary: '휴대폰을 기울이거나 화면 스틱으로 무당벌레를 움직여 적을 피하고, 10종 정원 능력과 영구 강화를 쌓는 세로형 생존 게임.',
+      impact: '57 Tests · PWA + Android APK',
+      role: '원작 조사 · 제품 기획 · AI 협업 개발 · 배포',
+      collaboration: true,
+      tags: ['Tilt Control', 'Canvas Combat', 'PWA + Android']
+    },
+    {
       id: 'lotto-signal-lab',
       title: 'Lotto Signal Lab',
       url: 'https://woo12345678.github.io/lotto-signal-lab/',
