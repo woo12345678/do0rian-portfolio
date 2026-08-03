@@ -50,6 +50,19 @@
       tags: ['AI Workflow', 'Rapid Prototyping', 'Survival']
     },
     {
+      id: 'hannun-life-help',
+      title: '한눈 생활도움',
+      url: 'https://woo12345678.github.io/hannun-life-help/',
+      image: 'assets/projects/hannun-life-help.png',
+      kind: 'web',
+      platform: 'WEB APP · PUBLIC UTILITY',
+      summary: '긴급전화, 문 연 병원·약국, 복지혜택과 보이스피싱 대처를 큰 글씨로 모으고 명확히 구분된 지역 광고 문의 공간을 마련한 무료 생활도움 서비스.',
+      impact: '12개 생활도움 · 6/6 Tests · 광고 문의 모델',
+      role: '제품 기획 · 공공정보 검증 · 접근성 설계 · 개발 · 배포',
+      collaboration: true,
+      tags: ['Public Utility', 'Senior Friendly', 'Local Ads']
+    },
+    {
       id: 'ladybug-garden',
       title: 'Ladybug Garden — Tilt Survivor',
       url: 'https://woo12345678.github.io/do0rian-portfolio/games/ladybug-garden/1a98be2/',

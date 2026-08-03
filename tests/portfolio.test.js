@@ -6,7 +6,7 @@ const projects = require('../projects.js');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 
-assert.strictEqual(projects.length, 22, '포트폴리오에는 현재 22개 공개 프로젝트가 있어야 합니다.');
+assert.strictEqual(projects.length, 23, '포트폴리오에는 현재 23개 공개 프로젝트가 있어야 합니다.');
 assert.strictEqual(new Set(projects.map(p => p.id)).size, projects.length, '프로젝트 ID는 고유해야 합니다.');
 projects.forEach(project => {
   ['id', 'title', 'url', 'image', 'kind', 'summary'].forEach(key => assert(project[key], `${project.id || 'project'}: ${key} 필드가 필요합니다.`));
@@ -29,6 +29,12 @@ assert(projects.some(p => p.url === 'https://woo12345678.github.io/mosquito-hunt
 assert(projects.some(p => p.url === 'https://woo12345678.github.io/character-vault/'));
 assert(projects.some(p => p.url === 'https://woo12345678.github.io/infinite-cat-desk/'));
 assert(projects.some(p => p.url === 'https://do0rian.itch.io/hotdog-street-empire'));
+const lifeHelp = projects.find(p => p.id === 'hannun-life-help');
+assert(lifeHelp, '한눈 생활도움 프로젝트가 필요합니다.');
+assert.strictEqual(lifeHelp.url, 'https://woo12345678.github.io/hannun-life-help/');
+assert.strictEqual(lifeHelp.image, 'assets/projects/hannun-life-help.png');
+assert(/광고/.test(lifeHelp.summary + lifeHelp.impact), '광고 문의 수익 모델을 표시해야 합니다.');
+assert(/6\/6/.test(lifeHelp.impact), '검증된 테스트 수를 표시해야 합니다.');
 const ladybugGarden = projects.find(p => p.id === 'ladybug-garden');
 assert(ladybugGarden, 'Ladybug Garden 프로젝트가 필요합니다.');
 assert.strictEqual(ladybugGarden.url, 'https://woo12345678.github.io/do0rian-portfolio/games/ladybug-garden/1a98be2/');
