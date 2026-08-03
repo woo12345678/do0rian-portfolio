@@ -52,12 +52,12 @@
     {
       id: 'ladybug-garden',
       title: 'Ladybug Garden — Tilt Survivor',
-      url: 'https://woo12345678.github.io/ladybug-garden/',
+      url: 'https://woo12345678.github.io/do0rian-portfolio/games/ladybug-garden/1a98be2/',
       image: 'assets/projects/ladybug-garden.png',
       kind: 'game',
-      platform: 'PWA + ANDROID · v1.1.2',
+      platform: 'PWA + ANDROID · FULLSCREEN BUILD',
       summary: '휴대전화 화면 전체를 채우는 정원에서 기울기·터치로 무당벌레를 움직이고, 원작 조사로 복원한 10종 능력과 영구 강화를 쌓는 세로형 생존 게임.',
-      impact: 'v1.1.2 · 77/77 Tests · PWA + Android APK',
+      impact: 'Latest 1a98be2 · v1.1.2 · 77/77 Tests',
       role: '원작 역공학 조사 · 제품 기획 · AI 협업 개발 · 멀티플랫폼 배포',
       collaboration: true,
       tags: ['Mobile Fullscreen', 'Tilt Control', 'PWA + Android']
