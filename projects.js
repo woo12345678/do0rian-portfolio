@@ -55,12 +55,12 @@
       url: 'https://woo12345678.github.io/ladybug-garden/',
       image: 'assets/projects/ladybug-garden.png',
       kind: 'game',
-      platform: 'PWA + ANDROID · TILT SURVIVAL',
-      summary: '휴대폰을 기울이거나 화면 스틱으로 무당벌레를 움직여 적을 피하고, 10종 정원 능력과 영구 강화를 쌓는 세로형 생존 게임.',
-      impact: '57 Tests · PWA + Android APK',
-      role: '원작 조사 · 제품 기획 · AI 협업 개발 · 배포',
+      platform: 'PWA + ANDROID · v1.1.2',
+      summary: '휴대전화 화면 전체를 채우는 정원에서 기울기·터치로 무당벌레를 움직이고, 원작 조사로 복원한 10종 능력과 영구 강화를 쌓는 세로형 생존 게임.',
+      impact: 'v1.1.2 · 77/77 Tests · PWA + Android APK',
+      role: '원작 역공학 조사 · 제품 기획 · AI 협업 개발 · 멀티플랫폼 배포',
       collaboration: true,
-      tags: ['Tilt Control', 'Canvas Combat', 'PWA + Android']
+      tags: ['Mobile Fullscreen', 'Tilt Control', 'PWA + Android']
     },
     {
       id: 'lotto-signal-lab',

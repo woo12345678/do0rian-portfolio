@@ -33,6 +33,10 @@ const ladybugGarden = projects.find(p => p.id === 'ladybug-garden');
 assert(ladybugGarden, 'Ladybug Garden 프로젝트가 필요합니다.');
 assert.strictEqual(ladybugGarden.url, 'https://woo12345678.github.io/ladybug-garden/');
 assert.strictEqual(ladybugGarden.image, 'assets/projects/ladybug-garden.png');
+assert(/v1\.1\.2/.test(ladybugGarden.impact), 'Ladybug Garden 최신 공개 버전을 표시해야 합니다.');
+assert(/v1\.1\.2/.test(ladybugGarden.platform), 'Ladybug Garden 카드에 최신 버전을 노출해야 합니다.');
+assert(/77\/77/.test(ladybugGarden.impact), 'Ladybug Garden 최신 테스트 수를 표시해야 합니다.');
+assert(ladybugGarden.tags.includes('Mobile Fullscreen'), 'Ladybug Garden 모바일 전체화면 지원을 표시해야 합니다.');
 
 ['hero', 'selectedWork', 'projectArchive', 'process', 'about'].forEach(id => assert(html.includes(`id="${id}"`), `${id} 섹션이 필요합니다.`));
 assert(html.includes('id="ambientCanvas"'), '히어로 앰비언트 캔버스가 필요합니다.');
