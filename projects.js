@@ -63,6 +63,19 @@
       tags: ['Public Utility', 'Senior Friendly', 'Local Ads']
     },
     {
+      id: 'playlog',
+      title: 'PLAYLOG — 나의 게임 인생',
+      url: 'https://woo12345678.github.io/playlog/',
+      image: 'assets/projects/playlog.png',
+      kind: 'web',
+      platform: 'WEB APP · GAME LIFELOG + DISCOVERY',
+      summary: '좋아한 게임을 최대 10개까지 넣어 추천 이유가 보이는 새 게임 8개를 찾고, 맵·캐릭터·색·조작의 기억 조각으로 추억의 게임을 유추하며, 플랫폼별 플레이 시간을 기록·공유하는 로컬 우선 게임 라이프로그.',
+      impact: '70 Game DB · Up to 10 Seeds · 12/12 Tests',
+      role: '제품 기획 · 게임 지식 DB · 추천/추억 검색 엔진 · UI 설계 · 개발 · 배포',
+      collaboration: true,
+      tags: ['Game Recommendation', 'Memory Finder', 'Local First']
+    },
+    {
       id: 'ladybug-garden',
       title: 'Ladybug Garden — Tilt Survivor',
       url: 'https://woo12345678.github.io/do0rian-portfolio/games/ladybug-garden/1a98be2/',

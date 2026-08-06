@@ -6,7 +6,7 @@ const projects = require('../projects.js');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 
-assert.strictEqual(projects.length, 23, '포트폴리오에는 현재 23개 공개 프로젝트가 있어야 합니다.');
+assert.strictEqual(projects.length, 24, '포트폴리오에는 현재 24개 공개 프로젝트가 있어야 합니다.');
 assert.strictEqual(new Set(projects.map(p => p.id)).size, projects.length, '프로젝트 ID는 고유해야 합니다.');
 projects.forEach(project => {
   ['id', 'title', 'url', 'image', 'kind', 'summary'].forEach(key => assert(project[key], `${project.id || 'project'}: ${key} 필드가 필요합니다.`));
@@ -35,6 +35,14 @@ assert.strictEqual(lifeHelp.url, 'https://woo12345678.github.io/hannun-life-help
 assert.strictEqual(lifeHelp.image, 'assets/projects/hannun-life-help.png');
 assert(/광고/.test(lifeHelp.summary + lifeHelp.impact), '광고 문의 수익 모델을 표시해야 합니다.');
 assert(/6\/6/.test(lifeHelp.impact), '검증된 테스트 수를 표시해야 합니다.');
+const playlog = projects.find(p => p.id === 'playlog');
+assert(playlog, 'PLAYLOG 프로젝트가 필요합니다.');
+assert.strictEqual(playlog.url, 'https://woo12345678.github.io/playlog/');
+assert.strictEqual(playlog.image, 'assets/projects/playlog.png');
+assert(/70 Game DB/.test(playlog.impact), 'PLAYLOG의 검증된 게임 지식 DB 규모를 표시해야 합니다.');
+assert(/10 Seeds/.test(playlog.impact), 'PLAYLOG의 다중 게임 입력 범위를 표시해야 합니다.');
+assert(/12\/12/.test(playlog.impact), 'PLAYLOG의 통과 테스트 수를 표시해야 합니다.');
+assert(playlog.tags.includes('Memory Finder'), 'PLAYLOG 추억 게임 찾기를 표시해야 합니다.');
 const ladybugGarden = projects.find(p => p.id === 'ladybug-garden');
 assert(ladybugGarden, 'Ladybug Garden 프로젝트가 필요합니다.');
 assert.strictEqual(ladybugGarden.url, 'https://woo12345678.github.io/do0rian-portfolio/games/ladybug-garden/1a98be2/');
