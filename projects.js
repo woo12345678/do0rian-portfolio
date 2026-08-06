@@ -69,11 +69,11 @@
       image: 'assets/projects/playlog.png',
       kind: 'web',
       platform: 'WEB APP · GAME LIFELOG + DISCOVERY',
-      summary: '좋아한 게임을 최대 10개까지 제목·한글/영문 별칭으로 검색해 추천 이유가 보이는 새 게임 8개를 찾고, 레이디버그 같은 기억 속 게임을 단서로 유추하며, 목록에 없는 게임도 직접 만들어 플레이 시간·통계·공유에 보존하는 로컬 우선 게임 라이프로그.',
-      impact: '71 Game DB · 10 Seeds + Custom Entry · 17/17 Tests',
-      role: '제품 기획 · 게임 지식 DB · 추천/추억 검색 엔진 · 검색/직접 추가 UX · 개발 · 배포',
+      summary: '실제 게임 171개와 신규 100개의 한글 통용 별칭을 바탕으로 최대 10개 취향을 설명 가능한 8개 추천으로 연결하고, 추억 단서 검색·사용자 게임 직접 추가·플레이 통계·공유를 제공하는 로컬 우선 게임 라이프로그. JSON 단일 원본과 검증 CLI로 개발자가 카탈로그를 쉽게 확장할 수 있다.',
+      impact: '171 Game DB · 100 Added · 10 Seeds + Custom Entry · 23/23 Tests',
+      role: '제품 기획 · 171개 게임 지식 DB 큐레이션 · 추천/추억 검색 엔진 · 카탈로그 CLI/검증 파이프라인 · 개발 · 배포',
       collaboration: true,
-      tags: ['Game Recommendation', 'Memory Finder', 'Custom Game Entry', 'Local First']
+      tags: ['Game Recommendation', 'Memory Finder', 'Catalog Pipeline', 'Custom Game Entry', 'Local First']
     },
     {
       id: 'ladybug-garden',
