@@ -69,11 +69,11 @@
       image: 'assets/projects/playlog.png',
       kind: 'web',
       platform: 'WEB APP · GAME LIFELOG + DISCOVERY',
-      summary: '실제 게임 186개와 모바일 게임 54개의 한글 통용 별칭을 바탕으로 최대 10개 취향을 설명 가능한 8개 추천으로 연결하는 로컬 우선 게임 라이프로그. Supercell 4종, DOORIAN의 Magic Brick Infinity, 장르별 모바일 10종을 공식 스토어·패키지·원본 Unity 설정까지 조사해 추가했으며 JSON 단일 원본과 검증 CLI로 계속 확장할 수 있다.',
-      impact: '186 Game DB · 54 Mobile · 10 Seeds + Custom Entry · 24/24 Tests',
-      role: '제품 기획 · 186개 게임 지식 DB 큐레이션 · 공식 출처 조사 · 추천/추억 검색 엔진 · 카탈로그 CLI/검증 파이프라인 · 개발 · 배포',
+      summary: 'Steam 인기 신규 100개, 모바일 인기 신규 50개, Nintendo 인기 신규 50개를 더해 총 386개 게임을 검색·추천하는 로컬 우선 게임 라이프로그. 전체 표지와 안전한 로컬 폴백을 제공하고, 최대 5개 게임의 뉴스·이벤트·YouTube 영상을 공개 피드로 모아 하루 두 번 자동 갱신하며 마지막 정상 결과를 보존한다.',
+      impact: '386 Game DB · Steam +100 · Mobile +50 · Switch +50 · 5-Game Live News · 40/40 Tests',
+      role: '제품 기획 · 386개 게임 지식 DB 큐레이션 · 공식 인기 데이터 import · 표지/fallback 파이프라인 · 추천/추억 검색 엔진 · 뉴스 관련성/안전 필터 · 자동 갱신 · 개발 · 배포',
       collaboration: true,
-      tags: ['Game Recommendation', 'Memory Finder', 'Catalog Pipeline', 'Custom Game Entry', 'Local First']
+      tags: ['Game Recommendation', 'Memory Finder', 'Live News', 'YouTube', 'Auto Refresh', 'Catalog Pipeline', 'Custom Game Entry', 'Local First']
     },
     {
       id: 'ladybug-garden',
