@@ -70,7 +70,7 @@
       kind: 'web',
       platform: 'WEB APP · GAME LIFELOG + DISCOVERY',
       summary: 'Steam 인기 신규 100개, 모바일 인기 신규 50개, Nintendo 인기 신규 50개를 더해 총 386개 게임을 검색·추천하는 로컬 우선 게임 라이프로그. 전체 표지와 안전한 로컬 폴백을 제공하고, 최대 5개 게임의 뉴스·이벤트·YouTube 영상을 공개 피드로 모아 하루 두 번 자동 갱신하며 마지막 정상 결과를 보존한다.',
-      impact: '386 Game DB · Steam +100 · Mobile +50 · Switch +50 · 5-Game Live News · 40/40 Tests',
+      impact: '386 Game DB · Steam +100 · Mobile +50 · Switch +50 · 5-Game Live News · 42/42 Tests',
       role: '제품 기획 · 386개 게임 지식 DB 큐레이션 · 공식 인기 데이터 import · 표지/fallback 파이프라인 · 추천/추억 검색 엔진 · 뉴스 관련성/안전 필터 · 자동 갱신 · 개발 · 배포',
       collaboration: true,
       tags: ['Game Recommendation', 'Memory Finder', 'Live News', 'YouTube', 'Auto Refresh', 'Catalog Pipeline', 'Custom Game Entry', 'Local First']
