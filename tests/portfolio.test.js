@@ -46,7 +46,9 @@ assert(/Steam \+100/.test(playlog.impact), 'PLAYLOG의 Steam 인기 신규 100�
 assert(/Mobile \+50/.test(playlog.impact), 'PLAYLOG의 모바일 인기 신규 50개를 표시해야 합니다.');
 assert(/Switch \+50/.test(playlog.impact), 'PLAYLOG의 Nintendo 신규 50개를 표시해야 합니다.');
 assert(/5-Game Live News/.test(playlog.impact), 'PLAYLOG의 최대 5게임 라이브 소식을 표시해야 합니다.');
-assert(/46\/46/.test(playlog.impact), 'PLAYLOG의 통과 테스트 수를 표시해야 합니다.');
+assert(/47\/47/.test(playlog.impact), 'PLAYLOG의 통과 테스트 수를 표시해야 합니다.');
+assert(/618/.test(playlog.summary) && /Web\/Flash.*108/.test(playlog.summary), 'PLAYLOG summary 수치도 동기화해야 합니다.');
+assert(/618/.test(playlog.role) && /Web\/Flash.*108/.test(playlog.role), 'PLAYLOG role 수치도 동기화해야 합니다.');
 assert(playlog.tags.includes('Memory Finder'), 'PLAYLOG 추억 게임 찾기를 표시해야 합니다.');
 assert(playlog.tags.includes('Live News'), 'PLAYLOG 뉴스·이벤트·YouTube 피드를 표시해야 합니다.');
 assert(playlog.tags.includes('Auto Refresh'), 'PLAYLOG 자동 소식 갱신을 표시해야 합니다.');
