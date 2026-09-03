@@ -6,7 +6,7 @@ const projects = require('../projects.js');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 
-assert.strictEqual(projects.length, 24, '포트폴리오에는 현재 24개 공개 프로젝트가 있어야 합니다.');
+assert.strictEqual(projects.length, 25, '포트폴리오에는 현재 25개 프로젝트가 있어야 합니다.');
 assert.strictEqual(new Set(projects.map(p => p.id)).size, projects.length, '프로젝트 ID는 고유해야 합니다.');
 projects.forEach(project => {
   ['id', 'title', 'url', 'image', 'kind', 'summary'].forEach(key => assert(project[key], `${project.id || 'project'}: ${key} 필드가 필요합니다.`));
@@ -17,6 +17,34 @@ projects.forEach(project => {
 
 const featured = projects.filter(p => p.featured);
 assert.deepStrictEqual(featured.map(p => p.id), ['magic-brick', 'make-tteok', 'neon-dash-waves']);
+const realDrive = projects.find(p => p.id === 'realdrive-horizon');
+assert(realDrive, 'RealDrive Horizon 프로젝트가 필요합니다.');
+assert.strictEqual(projects.indexOf(realDrive), 3, 'RealDrive Horizon은 featured 다음 archive 최상단에 있어야 합니다.');
+assert.strictEqual(realDrive.url, 'https://woo12345678.github.io/do0rian-portfolio/realdrive-horizon.html');
+assert.strictEqual(realDrive.image, 'assets/projects/realdrive-horizon.png');
+assert.strictEqual(realDrive.kind, 'game');
+assert(/WINDOWS/.test(realDrive.platform) && /UNITY/.test(realDrive.platform) && /IN DEVELOPMENT/.test(realDrive.platform));
+assert(/오픈월드/.test(realDrive.summary) && /파손/.test(realDrive.summary), '자유 차량 파손 오픈월드라는 핵심을 설명해야 합니다.');
+assert(/31/.test(realDrive.impact) && /6/.test(realDrive.impact) && /수리비/.test(realDrive.impact), '검증된 차량·지역·경제 범위를 표시해야 합니다.');
+assert(realDrive.tags.includes('Vehicle Damage') && realDrive.tags.includes('Open World'), '핵심 게임 시스템 태그가 필요합니다.');
+const realDriveDetailPath = path.join(root, 'realdrive-horizon.html');
+assert(fs.existsSync(realDriveDetailPath), 'RealDrive Horizon 상세 페이지가 필요합니다.');
+const realDriveDetail = fs.readFileSync(realDriveDetailPath, 'utf8');
+[
+  '개발 중', '자유로운 차량 파손', '31대', '6개 지역', '수리비', '주말 페스티벌',
+  'assets/projects/realdrive-horizon.png',
+  'assets/projects/realdrive-horizon-garage.png',
+  'assets/projects/realdrive-horizon-map.png'
+].forEach(text => assert(realDriveDetail.includes(text), `RealDrive 상세 페이지에 ${text} 정보가 필요합니다.`));
+assert(/아직 공개 다운로드를 제공하지 않습니다/.test(realDriveDetail), '개발 중인 게임을 공개된 것처럼 보이면 안 됩니다.');
+assert(/25개 프로젝트/.test(html), '공유 메타 설명의 프로젝트 수를 25개로 동기화해야 합니다.');
+assert(/realdrive-detail/.test(css), 'RealDrive 상세 페이지 전용 반응형 스타일이 필요합니다.');
+assert(/@media\(max-width:900px\)\{\.rd-hero\{grid-template-columns:minmax\(0,1fr\)/.test(css), '모바일 1열 hero는 큰 이미지 때문에 viewport를 넘지 않아야 합니다.');
+assert(/prefers-reduced-motion/.test(css), '상세 페이지도 모션 감소 접근성을 유지해야 합니다.');
+assert(/<a[^>]+href="\.\/"[^>]*>[^<]*(포트폴리오|돌아가기)/.test(realDriveDetail), '상세 페이지에서 포트폴리오로 돌아갈 수 있어야 합니다.');
+assert(/<main/.test(realDriveDetail) && /<h1[^>]*id="realdrive-title"[^>]*>[\s\S]*?RealDrive[\s\S]*?Horizon[\s\S]*?<\/h1>/.test(realDriveDetail), '상세 페이지에 semantic main과 단일 프로젝트 제목이 필요합니다.');
+assert(/meta name="description"/.test(realDriveDetail), '상세 페이지에 검색·공유 설명이 필요합니다.');
+assert(/loading="lazy"/.test(realDriveDetail), '하단 갤러리 이미지는 지연 로드해야 합니다.');
 assert(/18,?000|1\.8만/.test(projects.find(p => p.id === 'magic-brick').impact));
 assert(/2인|2-person/i.test(projects.find(p => p.id === 'make-tteok').impact));
 assert(/1시간|60\s*minute/i.test(projects.find(p => p.id === 'neon-dash-waves').impact));

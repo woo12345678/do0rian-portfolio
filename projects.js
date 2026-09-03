@@ -50,6 +50,19 @@
       tags: ['AI Workflow', 'Rapid Prototyping', 'Survival']
     },
     {
+      id: 'realdrive-horizon',
+      title: 'RealDrive Horizon',
+      url: 'https://woo12345678.github.io/do0rian-portfolio/realdrive-horizon.html',
+      image: 'assets/projects/realdrive-horizon.png',
+      kind: 'game',
+      platform: 'WINDOWS · UNITY · IN DEVELOPMENT',
+      summary: '자유로운 차량 파손을 중심으로 도시와 여섯 지역을 달리고, 충돌 뒤 손상에 비례한 수리비까지 감당하는 오픈월드 크래시 드라이빙 게임.',
+      impact: '31대 차량 · 6개 지역 · 손상 비례 수리비 경제 · Windows QA',
+      role: '게임 기획·디렉션 · 차량 물리/파손 시스템 · 오픈월드 콘텐츠 · QA/릴리스 파이프라인',
+      collaboration: true,
+      tags: ['Open World', 'Vehicle Damage', 'Driving Physics', 'Unity', 'Windows']
+    },
+    {
       id: 'hannun-life-help',
       title: '한눈 생활도움',
       url: 'https://woo12345678.github.io/hannun-life-help/',
