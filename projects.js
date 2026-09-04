@@ -63,6 +63,32 @@
       tags: ['Open World', 'Vehicle Damage', 'Driving Physics', 'Unity', 'Windows']
     },
     {
+      id: 'ttak-club',
+      title: '딱! 돌판클럽',
+      url: 'https://woo12345678.github.io/do0rian-portfolio/ttak-club.html',
+      image: 'assets/projects/ttak-club-home.png',
+      kind: 'game',
+      platform: 'BROWSER · LOCAL BUILD · SERVER REQUIRED',
+      summary: '손맛이 다른 7개 모드를 하나의 결정론적 물리·규칙·AI 위에 구축한 한지·먹·나무 감성의 서버 권위형 브라우저 돌판 게임 컬렉션.',
+      impact: '7 Modes · Local/Single/Private Online · 83/83 Tests PASS',
+      role: '게임 기획·아트 디렉션 · 공유 물리/규칙/AI · Canvas 2D · Socket.IO 서버 · QA',
+      collaboration: true,
+      tags: ['Tabletop Physics', '7 Modes', 'Canvas 2D', 'Socket.IO', 'Deterministic']
+    },
+    {
+      id: 'echo-front',
+      title: 'ECHO FRONT / 에코 프론트',
+      url: 'https://woo12345678.github.io/do0rian-portfolio/echo-front.html',
+      image: 'assets/projects/echo-front.png',
+      kind: 'game',
+      platform: 'BROWSER · LOCAL BUILD · SERVER REQUIRED',
+      summary: '52명의 오리지널 영웅, 9개 서버 권위형 모드, 11개 절차 생성 맵과 역할 균형 봇을 갖춘 5v5 브라우저 히어로 슈터.',
+      impact: '52 Heroes · 9 Modes · 11 Maps · 96/96 Tests PASS',
+      role: '게임·영웅·시스템 기획 · Three.js 클라이언트 · Socket.IO 권위 서버 · 봇/드래프트 · QA',
+      collaboration: true,
+      tags: ['Hero Shooter', '52 Heroes', '5v5', 'Three.js', 'Socket.IO']
+    },
+    {
       id: 'hannun-life-help',
       title: '한눈 생활도움',
       url: 'https://woo12345678.github.io/hannun-life-help/',
