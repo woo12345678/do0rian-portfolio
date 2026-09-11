@@ -32,7 +32,7 @@ const ttakClub = projects.find(p => p.id === 'ttak-club');
 const echoFront = projects.find(p => p.id === 'echo-front');
 assert.deepStrictEqual(projects.slice(3, 6).map(p => p.id), ['realdrive-horizon', 'ttak-club', 'echo-front'], '두 게임은 RealDrive 바로 다음, 비게임 프로젝트 전에 정확한 순서로 있어야 합니다.');
 [
-  [ttakClub, 'games/ttak-club/v1.0.2/', 'assets/projects/ttak-club-home.png', /7 Modes/, /105\/105/],
+  [ttakClub, 'games/ttak-club/v1.0.2/', 'assets/projects/ttak-club-home.png', /7 Modes/, /106\/106/],
   [echoFront, 'https://woo12345678.github.io/do0rian-portfolio/echo-front.html', 'assets/projects/echo-front.png', /52 Heroes.*9 Modes.*11 Maps/, /96\/96/]
 ].forEach(([project, url, image, scope, tests]) => {
   assert(project, `${url}: 프로젝트가 필요합니다.`);
@@ -43,7 +43,7 @@ assert.deepStrictEqual(projects.slice(3, 6).map(p => p.id), ['realdrive-horizon'
   assert(!project.featured, `${project.id}: featured로 표시하면 안 됩니다.`);
   assert(scope.test(project.impact) && tests.test(project.impact), `${project.id}: 검증된 범위와 테스트 수가 필요합니다.`);
 });
-assert(/BROWSER/.test(ttakClub.platform) && /STATIC/.test(ttakClub.platform) && /SOLO\/LOCAL/.test(ttakClub.platform) && /105 TESTS/.test(ttakClub.platform));
+assert(/BROWSER/.test(ttakClub.platform) && /STATIC/.test(ttakClub.platform) && /SOLO\/LOCAL/.test(ttakClub.platform) && /106 TESTS/.test(ttakClub.platform));
 assert(/LOCAL BUILD/.test(echoFront.platform) && /SERVER REQUIRED/.test(echoFront.platform));
 assert(/online rooms require (?:the )?server build/i.test(ttakClub.summary));
 assert(/결정론적/.test(ttakClub.summary) && /Canvas 2D/.test(ttakClub.role) && /Socket\.IO/.test(ttakClub.role));
@@ -75,10 +75,10 @@ assert.deepStrictEqual(listFiles(ttakReleaseDir).sort(), ttakReleaseFiles);
 const ttakBuildInfo = JSON.parse(fs.readFileSync(path.join(ttakReleaseDir, 'build-info.json'), 'utf8'));
 assert.deepStrictEqual(ttakBuildInfo, {
   version: '1.0.2',
-  sourceSha: '71a9d36efbb1179aa590f957b56e78d3a4b3f903',
+  sourceSha: 'e68362784ec53e3551cd1f2dce6c81f58b17fba1',
   edition: 'static-single-local',
   online: false,
-  testCount: 105,
+  testCount: 106,
   inventorySha256: '6c292580e802da8e941b26e01c3931908cf350ba829e5b8232475610cdc50dde'
 });
 const ttakRuntimeFiles = ttakReleaseFiles.filter(file => file !== 'build-info.json' && !file.endsWith('.zip')).sort();
@@ -88,7 +88,7 @@ const ttakInventory = crypto.createHash('sha256').update(ttakRuntimeFiles.map(fi
 }).join('')).digest('hex');
 assert.strictEqual(ttakInventory, ttakBuildInfo.inventorySha256, 'deployed TTAK runtime files must match the verified inventory');
 const ttakZip = fs.readFileSync(path.join(ttakReleaseDir, 'TTAK-Table-Club-v1.0.2-itch.zip'));
-assert.strictEqual(crypto.createHash('sha256').update(ttakZip).digest('hex'), '777486e4d6be6efb27303cc2a9191178e3baecf29579e398bd87aa042595d984');
+assert.strictEqual(crypto.createHash('sha256').update(ttakZip).digest('hex'), '366fe8267edd7e729d2cdcb937918460f9134fe34350491ca7deab9b7e3427db');
 const ttakReleaseIndex = fs.readFileSync(path.join(ttakReleaseDir, 'index.html'), 'utf8');
 ['./manifest.webmanifest', './css/style.css', './css/pigments.css', './shared/physics.js', './shared/rules.js', './shared/ai.js', './js/app.js']
   .forEach(asset => assert(ttakReleaseIndex.includes(asset), `TTAK release index must use relative asset ${asset}`));
@@ -100,7 +100,7 @@ const ttakReleaseApp = fs.readFileSync(path.join(ttakReleaseDir, 'js/app.js'), '
   .forEach(text => assert(ttakReleaseApp.includes(text), `TTAK release app needs bilingual contract: ${text}`));
 assert(ttakReleaseApp.includes("easy:'쉬움'") && ttakReleaseApp.includes("easy:'Easy'") && !ttakReleaseApp.includes('uneasy:'), 'TTAK static runtime must preserve Korean/English difficulty keys');
 assert(!/\bio\(\)|\bsocket\b|onlineAction|roomCode|myId|#onlineBox|data-flow=["']online["']|setupOnline|onlineEntry|copyCode|room:(?:create|join|state)|game:(?:shot|snapshot|event|turn)/.test(ttakReleaseApp), 'TTAK static runtime must not ship online or Socket.IO code');
-assert(/single\/local/i.test(ttakClub.impact) && /v1\.0\.2/.test(ttakClub.impact) && /105\/105/.test(ttakClub.impact));
+assert(/single\/local/i.test(ttakClub.impact) && /v1\.0\.2/.test(ttakClub.impact) && /106\/106/.test(ttakClub.impact));
 const ttakDetailRelease = fs.readFileSync(path.join(root, 'ttak-club.html'), 'utf8');
 assert(/href="games\/ttak-club\/v1\.0\.2\/"/.test(ttakDetailRelease), 'TTAK detail needs the exact Play link.');
 assert(/href="games\/ttak-club\/v1\.0\.2\/TTAK-Table-Club-v1\.0\.2-itch\.zip"/.test(ttakDetailRelease), 'TTAK detail needs the exact itch ZIP link.');
@@ -111,7 +111,7 @@ assert(/data-project-id="echo-front"[^}]+object-position:20% 50%/.test(css), 'EC
 ['assets/projects/ttak-club.png', 'assets/projects/ttak-club-home.png', 'assets/projects/echo-front.png', 'assets/projects/echo-front-draft.png']
   .forEach(image => assert(fs.existsSync(path.join(root, image)), `${image}: 실제 스크린샷이 필요합니다.`));
 [
-  ['ttak-club.html', 'ttak-title', ['7개 모드', '105/105', '결정론적', 'Socket.IO', 'PUBLIC WEB', 'ITCH BUILD v1.0.2', 'assets/projects/ttak-club.png', 'assets/projects/ttak-club-home.png']],
+  ['ttak-club.html', 'ttak-title', ['7개 모드', '106/106', '결정론적', 'Socket.IO', 'PUBLIC WEB', 'ITCH BUILD v1.0.2', 'assets/projects/ttak-club.png', 'assets/projects/ttak-club-home.png']],
   ['echo-front.html', 'echo-title', ['52', '14 Tank', '24 Damage', '14 Support', '9개', '11개', '15초', '96/96', 'Three.js', 'Socket.IO', '공개 플레이 서버나 다운로드를 제공하지 않습니다', 'assets/projects/echo-front.png', 'assets/projects/echo-front-draft.png']]
 ].forEach(([file, titleId, facts]) => {
   const detailPath = path.join(root, file);
