@@ -65,12 +65,12 @@
     {
       id: 'ttak-club',
       title: '딱! 돌판클럽',
-      url: 'https://woo12345678.github.io/do0rian-portfolio/ttak-club.html',
+      url: 'games/ttak-club/v1.0.1/',
       image: 'assets/projects/ttak-club-home.png',
       kind: 'game',
-      platform: 'BROWSER · LOCAL BUILD · SERVER REQUIRED',
-      summary: '손맛이 다른 7개 모드를 하나의 결정론적 물리·규칙·AI 위에 구축한 한지·먹·나무 감성의 서버 권위형 브라우저 돌판 게임 컬렉션.',
-      impact: '7 Modes · Local/Single/Private Online · 83/83 Tests PASS',
+      platform: 'BROWSER · STATIC SOLO/LOCAL · 94 TESTS',
+      summary: '손맛이 다른 7개 모드를 하나의 결정론적 물리·규칙·AI 위에 구축한 한지·먹·나무 감성의 브라우저 돌판 게임 컬렉션. This static release supports solo/local play; online rooms require the server build.',
+      impact: '7 Modes · Static Single/Local · v1.0.1 · 94/94 Tests PASS',
       role: '게임 기획·아트 디렉션 · 공유 물리/규칙/AI · Canvas 2D · Socket.IO 서버 · QA',
       collaboration: true,
       tags: ['Tabletop Physics', '7 Modes', 'Canvas 2D', 'Socket.IO', 'Deterministic']
