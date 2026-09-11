@@ -103,7 +103,7 @@
     if(g.phase!=='finished')return null;
     const cooperative=g.mode==='coop'||(g.mode==='chain'&&g.coop);
     const solo=g.players===1;
-    const outcome=cooperative?(g.winner==null?'defeat':'victory'):g.winner==null?'draw':solo?'victory':'competitive-win';
+    const outcome=cooperative?(g.winner==null?'defeat':'victory'):solo?(g.winner==null?'defeat':'victory'):g.winner==null?'draw':'competitive-win';
     return {mode:g.mode,outcome,winner:g.winner,defeated:g.winner==null?[]:Array.from({length:g.players},(_,i)=>i).filter(i=>i!==g.winner)};
   }
   return {MODES:['classic','football','line','golf','coop','royal','chain'],FORMATIONS,FIELD_GEOMETRY,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
