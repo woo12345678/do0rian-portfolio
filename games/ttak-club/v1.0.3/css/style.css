@@ -6,3 +6,34 @@
 .result-panel{position:absolute;inset:clamp(18px,8%,70px);z-index:4;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:clamp(20px,5vw,55px);line-height:1.4;background:#e7dcc1ee;border:10px solid var(--wood);box-shadow:0 12px 35px #211b17aa;background-image:repeating-linear-gradient(7deg,transparent 0 11px,#5e4b3214 12px,transparent 13px)}.result-panel h2{font-size:clamp(25px,4vw,48px);margin:10px 0;color:var(--red)}.result-panel p{max-width:650px}.result-actions{display:flex;gap:14px;margin-top:18px}.result-actions button{min-height:46px;padding:10px 18px;border:2px solid var(--ink);background:#e7dcc1}.result-actions button:first-child{background:var(--ink);color:var(--paper)}@media(max-width:760px){header{height:auto;min-height:122px;flex-wrap:wrap}.tools{flex:0 0 100%;justify-content:flex-end}.tools button{min-height:44px}.tools .connection{display:none}.modes{grid-template-columns:repeat(3,1fr)}.result-panel{inset:8px;border-width:6px;padding:14px}.result-panel h2{font-size:22px}.result-actions{width:100%;flex-direction:column;gap:8px}.result-actions button{width:100%}}
 
 .static-online-disabled{opacity:.48;cursor:not-allowed;filter:grayscale(.45)}
+
+.embed-hint{display:none}
+@media (max-height:500px) and (min-width:540px) and (orientation:landscape){
+html,body{height:100%;min-height:0}
+body:has(#home:not(.hidden)),body:has(#game:not(.hidden)){overflow:hidden}
+header{height:64px;min-height:64px;padding:6px 22px;flex-wrap:nowrap}
+.brand{gap:8px}.seal{width:42px;height:42px;font-size:15px}.brand h1{font-size:18px}.brand p{font-size:8px}.tools{flex:0 1 auto;gap:6px}.tools button{min-height:32px;padding:5px 7px;font-size:13px}
+main{height:calc(100vh - 64px);min-height:0;grid-template-columns:14px minmax(0,1fr) 14px;margin:0}
+.margin{padding:5px 0}.margin svg{display:none}.vertical{font-size:8px;letter-spacing:.1em}
+#home{height:100%;min-height:0;position:relative;overflow:hidden;padding:8px 14px 6px}
+#home .eyebrow{font-size:9px;margin:0 0 2px}
+#home h2{font-size:34px;line-height:.94;margin:2px 0 5px}
+#home .lead{font-size:11px;line-height:1.25;margin:0}
+.embed-hint{display:block;position:absolute;right:12px;top:8px;z-index:2;margin:0;padding:3px 7px;border:1px solid #a3473588;background:#e7dcc1e8;color:var(--red);font:700 9px/1.2 "Malgun Gothic","Apple SD Gothic Neo",sans-serif;letter-spacing:.02em}
+#home .entry{display:flex;flex-direction:row;gap:6px;margin:5px 0 4px}
+#home .entry button{flex:1 1 0;min-width:0;min-height:42px;padding:4px 5px;border-top-width:2px;line-height:1.05}
+#home .entry b{font-size:13px}#home .entry small{font-size:7px}.brushline{height:3px}
+#home .modes{display:flex;grid-template-columns:none;gap:6px;margin-top:5px;padding:0 0 7px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scrollbar-color:var(--red) #cbbd9f;scrollbar-width:auto;cursor:grab;touch-action:pan-x}
+#home .modes.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+#home .modes::-webkit-scrollbar{height:7px}#home .modes::-webkit-scrollbar-track{background:#cbbd9f}#home .modes::-webkit-scrollbar-thumb{background:var(--red);border-radius:6px}
+#home .mode-mark{flex:0 0 92px;min-height:59px;padding:4px 3px;scroll-snap-align:start}
+#home .mode-mark i{width:20px;height:20px;margin-bottom:2px;border-width:2px}#home .mode-mark b{font-size:9px}#home .mode-mark small{font-size:7px}#home .mode-mark .mode-description{display:none}
+body:has(#game:not(.hidden)) header{display:none}
+body:has(#game:not(.hidden)) main{height:100vh;grid-template-columns:0 minmax(0,1fr) 0;margin:0}
+body:has(#game:not(.hidden)) .margin{display:none}
+.game{height:100%;min-height:0;padding:4px 8px;display:flex;flex-direction:column;overflow:hidden}
+.gamebar{min-height:42px;flex:0 0 42px;gap:8px}.gamebar strong{font-size:14px}.gamebar span{font-size:9px}
+.canvaswrap{flex:1 1 auto;min-height:0;border-width:6px;display:grid;place-items:center}
+.canvaswrap canvas{width:auto;height:100%;min-width:0;min-height:0;max-width:100%;max-height:100%;aspect-ratio:5/3}
+.hint{flex:0 0 auto;margin:2px 0 0;font-size:9px;line-height:1.2}
+}
