@@ -32,8 +32,25 @@ body:has(#game:not(.hidden)) header{display:none}
 body:has(#game:not(.hidden)) main{height:100vh;grid-template-columns:0 minmax(0,1fr) 0;margin:0}
 body:has(#game:not(.hidden)) .margin{display:none}
 .game{height:100%;min-height:0;padding:4px 8px;display:flex;flex-direction:column;overflow:hidden}
-.gamebar{min-height:42px;flex:0 0 42px;gap:8px}.gamebar strong{font-size:14px}.gamebar span{font-size:9px}
+.gamebar{min-height:44px;flex:0 0 44px;gap:8px}.gamebar strong{font-size:14px}.gamebar span{font-size:9px}
 .canvaswrap{flex:1 1 auto;min-height:0;border-width:6px;display:grid;place-items:center}
 .canvaswrap canvas{width:auto;height:100%;min-width:0;min-height:0;max-width:100%;max-height:100%;aspect-ratio:5/3}
 .hint{flex:0 0 auto;margin:2px 0 0;font-size:9px;line-height:1.2}
 }
+
+.mode-guide-button{display:block;margin:-4px 0 18px;padding:10px 16px;border:2px solid var(--red);border-radius:999px;background:#fff8;color:var(--red);font-weight:900;box-shadow:3px 3px 0 #2a21172b}
+.mode-guide-button:hover,.mode-guide-button:focus-visible{background:var(--red);color:var(--paper)}
+.guide-icon{display:grid;place-items:center;min-width:44px;width:44px;height:44px;padding:0;border:2px solid var(--red);border-radius:50%;background:var(--paper);color:var(--red);font-size:22px;font-weight:900}
+.mode-guide-dialog{width:min(760px,calc(100vw - 28px));max-width:760px;max-height:calc(100vh - 24px);overflow:auto;padding:28px;border-width:8px}
+.mode-guide-dialog h2{margin:2px 44px 5px 0;font-size:clamp(30px,6vw,50px);line-height:1;color:var(--red)}
+.guide-summary{margin:0 0 18px;color:#625847;font-weight:700}
+.guide-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;list-style:none;margin:0;padding:0;counter-reset:guide}
+.guide-step{position:relative;min-height:150px;padding:50px 14px 14px;border:2px solid #2d281f;background:#fff8;box-shadow:5px 5px 0 #2d281f1c;counter-increment:guide}
+.guide-step::before{content:counter(guide);position:absolute;top:10px;left:12px;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--red);color:white;font-size:18px;font-weight:900}
+.guide-step strong{display:block;margin-bottom:7px;color:var(--red);font-size:13px;letter-spacing:.08em}
+.guide-step span{display:block;font-size:15px;line-height:1.45;font-weight:700}
+.guide-tip{margin:16px 0;padding:11px 14px;border-left:5px solid var(--brass);background:#f2e4bd;font-size:14px;line-height:1.4;font-weight:700}
+.mode-guide-dialog .inkbtn{display:block;width:100%;min-height:48px}
+
+@media(max-width:520px){.guide-steps{grid-template-columns:1fr}.guide-step{min-height:0;padding:16px 14px 16px 58px}.guide-step::before{top:14px}.mode-guide-dialog{padding:20px}.guide-step span{font-size:16px}}
+@media(max-height:500px) and (min-width:540px) and (orientation:landscape){.mode-guide-button{margin:-2px 0 7px;padding:6px 12px;font-size:11px}.guide-icon{min-width:44px;width:44px;height:44px;font-size:17px}.mode-guide-dialog{padding:12px 16px;border-width:5px}.mode-guide-dialog h2{font-size:26px;margin-bottom:2px}.mode-guide-dialog .eyebrow{margin:0}.guide-summary{margin:0 0 7px;font-size:11px}.guide-steps{gap:7px}.guide-step{min-height:105px;padding:35px 8px 7px}.guide-step::before{top:6px;left:7px;width:23px;height:23px;font-size:14px}.guide-step strong{margin-bottom:3px;font-size:10px}.guide-step span{font-size:11px;line-height:1.28}.guide-tip{margin:7px 0;padding:6px 9px;font-size:10px}.mode-guide-dialog .inkbtn{min-height:34px;padding:6px}}
