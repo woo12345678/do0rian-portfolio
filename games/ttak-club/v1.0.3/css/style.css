@@ -44,6 +44,7 @@ body:has(#game:not(.hidden)) .margin{display:none}
 .mode-guide-dialog{width:min(760px,calc(100vw - 28px));max-width:760px;max-height:calc(100vh - 24px);overflow:auto;padding:28px;border-width:8px}
 .mode-guide-dialog h2{margin:2px 44px 5px 0;font-size:clamp(30px,6vw,50px);line-height:1;color:var(--red)}
 .guide-summary{margin:0 0 18px;color:#625847;font-weight:700}
+.guide-language-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;font-weight:900;color:#433b30}.guide-language-row span{font-size:13px}.guide-language-row select{min-width:190px;min-height:44px;padding:8px 34px 8px 12px;border:2px solid #2d281f;border-radius:0;background:#fffaf0;color:#24211d;font:900 15px system-ui,sans-serif}
 .guide-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;list-style:none;margin:0;padding:0;counter-reset:guide}
 .guide-step{position:relative;min-height:150px;padding:50px 14px 14px;border:2px solid #2d281f;background:#fff8;box-shadow:5px 5px 0 #2d281f1c;counter-increment:guide}
 .guide-step::before{content:counter(guide);position:absolute;top:10px;left:12px;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--red);color:white;font-size:18px;font-weight:900}
@@ -52,5 +53,5 @@ body:has(#game:not(.hidden)) .margin{display:none}
 .guide-tip{margin:16px 0;padding:11px 14px;border-left:5px solid var(--brass);background:#f2e4bd;font-size:14px;line-height:1.4;font-weight:700}
 .mode-guide-dialog .inkbtn{display:block;width:100%;min-height:48px}
 
-@media(max-width:520px){.guide-steps{grid-template-columns:1fr}.guide-step{min-height:0;padding:16px 14px 16px 58px}.guide-step::before{top:14px}.mode-guide-dialog{padding:20px}.guide-step span{font-size:16px}}
+@media(max-width:520px){.guide-language-row{align-items:stretch;flex-direction:column;gap:5px}.guide-language-row select{width:100%;min-width:0}.guide-steps{grid-template-columns:1fr}.guide-step{min-height:0;padding:16px 14px 16px 58px}.guide-step::before{top:14px}.mode-guide-dialog{padding:20px}.guide-step span{font-size:16px}}
 @media(max-height:500px) and (min-width:540px) and (orientation:landscape){.mode-guide-button{margin:-2px 0 7px;padding:6px 12px;font-size:11px}.guide-icon{min-width:44px;width:44px;height:44px;font-size:17px}.mode-guide-dialog{padding:12px 16px;border-width:5px}.mode-guide-dialog h2{font-size:26px;margin-bottom:2px}.mode-guide-dialog .eyebrow{margin:0}.guide-summary{margin:0 0 7px;font-size:11px}.guide-steps{gap:7px}.guide-step{min-height:105px;padding:35px 8px 7px}.guide-step::before{top:6px;left:7px;width:23px;height:23px;font-size:14px}.guide-step strong{margin-bottom:3px;font-size:10px}.guide-step span{font-size:11px;line-height:1.28}.guide-tip{margin:7px 0;padding:6px 9px;font-size:10px}.mode-guide-dialog .inkbtn{min-height:34px;padding:6px}}
