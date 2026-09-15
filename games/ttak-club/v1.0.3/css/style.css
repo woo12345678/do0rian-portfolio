@@ -32,7 +32,7 @@ body:has(#game:not(.hidden)) header{display:none}
 body:has(#game:not(.hidden)) main{height:100vh;grid-template-columns:0 minmax(0,1fr) 0;margin:0}
 body:has(#game:not(.hidden)) .margin{display:none}
 .game{height:100%;min-height:0;padding:4px 8px;display:flex;flex-direction:column;overflow:hidden}
-.gamebar{min-height:44px;flex:0 0 44px;gap:8px}.gamebar strong{font-size:14px}.gamebar span{font-size:9px}
+.gamebar{min-height:44px;flex:0 0 44px;gap:8px;flex-wrap:nowrap;overflow:hidden}.gamebar>div:nth-child(2){min-width:0}.gamebar strong,.gamebar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gamebar strong{font-size:14px}.gamebar span{font-size:9px}
 .gamebar>button{min-height:40px;display:flex;align-items:center;justify-content:center;padding:4px 6px}
 .canvaswrap{flex:1 1 auto;min-height:0;border-width:6px;display:grid;place-items:center}
 .canvaswrap canvas{width:auto;height:100%;min-width:0;min-height:0;max-width:100%;max-height:100%;aspect-ratio:5/3}
