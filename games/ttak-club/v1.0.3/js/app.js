@@ -80,7 +80,7 @@ const canvas=$('#board'),ctx=canvas.getContext('2d');
 function resize(){const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.width*.6*d);ctx.setTransform(canvas.width/1200,0,0,canvas.height/720,0,0);}
 addEventListener('resize',resize);
 function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*1200/r.width,y:(e.clientY-r.top)*720/r.height};}
-canvas.onpointerdown=e=>{if(!game||game.phase!=='aiming'||paused)return;ensureAudio();const p=pointer(e),legal=R.eligibleObjects(game);const o=legal.find(d=>Math.hypot(d.x-p.x,d.y-p.y)<=d.radius+14);if(!o)return invalid(t('chooseOwn'));selected=o;aim=p;canvas.setPointerCapture(e.pointerId)};
+canvas.onpointerdown=e=>{if(!game||game.phase!=='aiming'||paused)return;ensureAudio();const p=pointer(e),legal=R.eligibleObjects(game),r=canvas.getBoundingClientRect(),coarseRadius=(e.pointerType==='touch'?30:e.pointerType==='pen'?22:0)*1200/r.width;const o=legal.map(d=>({disc:d,distance:Math.hypot(d.x-p.x,d.y-p.y)})).filter(candidate=>candidate.distance<=Math.max(candidate.disc.radius+14,coarseRadius)).sort((a,b)=>a.distance-b.distance)[0]?.disc;if(!o)return invalid(t('chooseOwn'));selected=o;aim=p;canvas.setPointerCapture(e.pointerId)};
 canvas.onpointermove=e=>{if(aim)aim=pointer(e)};
 canvas.onpointercancel=()=>{selected=aim=null;};
 canvas.onpointerup=e=>{if(!selected||!aim)return;const force={x:(selected.x-aim.x)*7.2,y:(selected.y-aim.y)*7.2},mag=Math.hypot(force.x,force.y);if(mag<80){selected=aim=null;return invalid(t('pullMore'));}if(mag>P.MAX_SPEED){force.x*=P.MAX_SPEED/mag;force.y*=P.MAX_SPEED/mag;}fire(selected.id,force);selected=aim=null;};
