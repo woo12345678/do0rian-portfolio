@@ -47,8 +47,8 @@
     return best;
   }
   function lineShot(g,disc,profile,random){
-    const safety=24,target={x:disc.x,y:g.board.targetLine+safety};
-    const travel=Math.max(0,disc.y-target.y),friction=g.board.friction||1.65,dt=1/120;
+    const target=R.lineTarget(g.board.targetLine,disc,24);
+    const travel=distance(disc,target),friction=g.board.friction||1.65,dt=1/120;
     const travelPerSpeed=dt/(1-Math.exp(-friction*dt));
     const power=travel/travelPerSpeed+P.REST_SPEED;
     return shotToward(disc,target,power,{...profile,jitter:profile.jitter*.12},random);
@@ -98,7 +98,7 @@
   function objective(g,disc){
     const foes=g.objects.filter(o=>o.active&&o.team!==disc.team&&o.kind!=='target'&&o.kind!=='ball');
     if(g.mode==='football')return g.objects.find(o=>o.kind==='ball');
-    if(g.mode==='line')return{x:disc.x,y:g.board.targetLine+25};
+    if(g.mode==='line')return R.lineTarget(g.board.targetLine,disc,25);
     if(g.mode==='golf')return g.board.cup;
     if(g.mode==='coop')return g.objects.filter(o=>o.active&&o.kind==='goblin').sort((a,b)=>Number(b.heavy)-Number(a.heavy))[0];
     if(g.mode==='chain')return g.objects.find(o=>o.kind==='target'&&o.number===g.nextTarget);

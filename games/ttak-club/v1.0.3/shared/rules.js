@@ -15,6 +15,25 @@
     classic:{grid:{lines:19,left:294,top:54,spacing:34},stars:[3,9,15].flatMap(row=>[3,9,15].map(column=>({column,row}))),frame:{x:270,y:30,w:660,h:660}},
     football:{orientation:'vertical',goals:{x1:500,x2:700},touchline:{x:310,y:20,w:580,h:680},halfway:{y:360},center:{x:600,y:360,radius:72},penaltyBoxes:[{x:430,y:20,w:340,h:125},{x:430,y:575,w:340,h:125}]}
   });
+  const LINE_LAYOUTS=deepFreeze([
+    {id:'h-close',kind:'horizontal',a:{x:70,y:410},b:{x:1130,y:410},spawns:[{x:520,y:630},{x:680,y:630}]},
+    {id:'h-far',kind:'horizontal',a:{x:70,y:90},b:{x:1130,y:90},spawns:[{x:500,y:630},{x:700,y:630}]},
+    {id:'h-offset',kind:'horizontal',a:{x:170,y:255},b:{x:1030,y:255},spawns:[{x:350,y:635},{x:850,y:635}]},
+    {id:'v-left',kind:'vertical',a:{x:160,y:70},b:{x:160,y:650},spawns:[{x:900,y:300},{x:900,y:430}]},
+    {id:'v-right',kind:'vertical',a:{x:1040,y:70},b:{x:1040,y:650},spawns:[{x:300,y:300},{x:300,y:430}]},
+    {id:'diag-rise',kind:'diagonal',a:{x:160,y:165},b:{x:1040,y:505},spawns:[{x:430,y:650},{x:760,y:650}]},
+    {id:'diag-fall',kind:'diagonal',a:{x:160,y:505},b:{x:1040,y:165},spawns:[{x:440,y:650},{x:770,y:650}]},
+    {id:'diag-steep',kind:'diagonal',a:{x:420,y:75},b:{x:760,y:645},spawns:[{x:120,y:500},{x:195,y:635}]}
+  ]);
+  let lastLineLayoutId=null;
+  const lineCross=(line,point)=>(line.b.x-line.a.x)*(point.y-line.a.y)-(line.b.y-line.a.y)*(point.x-line.a.x);
+  function chooseLineLayout(random=Math.random,requested){
+    const forced=LINE_LAYOUTS.find(layout=>layout.id===requested);if(forced){lastLineLayoutId=forced.id;return forced;}
+    const choices=LINE_LAYOUTS.filter(layout=>layout.id!==lastLineLayoutId),roll=Math.max(0,Math.min(.999999,Number(random())||0)),selected=choices[Math.floor(roll*choices.length)];
+    lastLineLayoutId=selected.id;return selected;
+  }
+  function lineMeasure(line,point){const length=Math.hypot(line.b.x-line.a.x,line.b.y-line.a.y)||1,signed=lineCross(line,point)/length*line.safeSign;return{legal:signed>=0,distance:Math.abs(signed),signed};}
+  function lineTarget(line,point,safety=24){const dx=line.b.x-line.a.x,dy=line.b.y-line.a.y,length2=dx*dx+dy*dy||1,length=Math.sqrt(length2),t=((point.x-line.a.x)*dx+(point.y-line.a.y)*dy)/length2;return{x:line.a.x+dx*t-dy/length*line.safeSign*safety,y:line.a.y+dy*t+dx/length*line.safeSign*safety};}
   const HOLES = [
     { name: '소나무 굽이', tee: {x:150,y:560}, cup:{x:1020,y:150,r:30}, rocks:[{x:570,y:340,r:72}], rough:[{x:650,y:80,w:220,h:210}] },
     { name: '두루미 길', tee: {x:130,y:180}, cup:{x:1040,y:560,r:30}, rocks:[{x:420,y:390,r:58},{x:780,y:330,r:65}], rough:[{x:480,y:500,w:300,h:120}] },
@@ -65,7 +84,7 @@
     const g={mode,players,settings,phase:'aiming',turn:0,round:1,shot:0,winner:null,scores:Array(players).fill(0),objects:[],board:{width:W,height:H,walls:false,orientation:'vertical'},events:[]};
     if(mode==='classic'){g.board.geometry=FIELD_GEOMETRY.classic;g.board.playfield=FIELD_GEOMETRY.classic.frame;g.board.surface='baduk';g.objects=classicPieces(Math.max(1,Math.min(20,s.discs||5)),settings.formation);}
     if(mode==='football'){g.board.walls=true;g.board.geometry=FIELD_GEOMETRY.football;g.board.playfield=FIELD_GEOMETRY.football.touchline;g.board.goals={...FIELD_GEOMETRY.football.goals};g.board.surface='grass';g.objects=verticalRows(players,3,23);g.objects.push(P.body({id:'ball',kind:'ball',x:600,y:360,radius:20,mass:.65}));}
-    if(mode==='line'){g.board={width:W,height:H,walls:true,openEdges:{top:true},orientation:'vertical',targetAxis:'y',targetLine:160};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=Array.from({length:players},(_,t)=>disc(t,520+t*160,620));}
+    if(mode==='line'){const layout=chooseLineLayout(opts.rng,s.lineLayout),safeSign=Math.sign(lineCross(layout,layout.spawns[0]))||1;g.board={width:W,height:H,walls:true,orientation:'vertical',targetLine:{id:layout.id,kind:layout.kind,a:{...layout.a},b:{...layout.b},safeSign}};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=Array.from({length:players},(_,t)=>{const spawn=layout.spawns[t%layout.spawns.length];return disc(t,spawn.x,spawn.y);});}
     if(mode==='golf'){g.board.walls=true;g.hole=0; setupHole(g);}
     if(mode==='coop'){g.players=players;g.turnBudget=12;g.wave=1;spawnCoop(g);}
     if(mode==='royal'){g.board.walls=true;g.board.inset=35;g.objects=rows(players,s.discs||3,23);}
@@ -92,7 +111,7 @@
     if(g.mode==='coop'&&g.counterActive){g.counterActive=false;if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}ensureActiveTurn(g);return;}
     if(g.mode==='classic'){const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if(alive.size<=1){g.phase='finished';g.winner=[...alive][0]??null;return;}}
     if(g.mode==='football'){for(const e of events.filter(e=>e.type==='goal')){const scorer=e.side==='top'?0:1;g.scores[scorer]++;const ball=g.objects.find(o=>o.kind==='ball');Object.assign(ball,{x:600,y:360,vx:0,vy:0,active:true});if(g.scores[scorer]>=Math.max(1,g.settings.targetScore||3)){g.winner=scorer;g.phase='finished';return;}}}
-    if(g.mode==='line'){g.attempts[g.turn].push({complete:true});if(g.attempts.every(a=>a.length>=1)){g.attempts=g.attempts.map((_,team)=>{const o=g.objects.find(d=>d.kind==='disc'&&d.team===team),legal=!!o&&o.active&&o.y>=g.board.targetLine&&o.y<=H;return[{legal,distance:legal?o.y-g.board.targetLine:null}]});const best=Math.min(...g.attempts.flat().filter(v=>v.legal).map(v=>v.distance),Infinity);const leaders=g.attempts.map((a,i)=>a.some(v=>v.legal&&v.distance===best)?i:null).filter(i=>i!==null);g.winner=leaders.length===1?leaders[0]:null;g.phase='finished';return;}}
+    if(g.mode==='line'){g.attempts[g.turn].push({complete:true});if(g.attempts.every(a=>a.length>=1)){g.attempts=g.attempts.map((_,team)=>{const o=g.objects.find(d=>d.kind==='disc'&&d.team===team),measurement=o&&o.active?lineMeasure(g.board.targetLine,o):null,legal=!!measurement?.legal;return[{legal,distance:legal?measurement.distance:null}]});const best=Math.min(...g.attempts.flat().filter(v=>v.legal).map(v=>v.distance),Infinity);const leaders=g.attempts.map((a,i)=>a.some(v=>v.legal&&Math.abs(v.distance-best)<1e-6)?i:null).filter(i=>i!==null);g.winner=leaders.length===1?leaders[0]:null;g.phase='finished';return;}}
     if(g.mode==='golf'){const o=g.objects.find(o=>o.kind==='disc'&&o.team===g.turn);const sunk=events.some(e=>e.type==='cup'&&e.team===g.turn)||(!o?.active||Math.hypot(o.x-g.board.cup.x,o.y-g.board.cup.y)<g.board.cup.r);if(sunk&&o){o.active=false;o.vx=o.vy=0;}const active=g.objects.filter(d=>d.kind==='disc'&&d.active);if(sunk&&!active.length){g.hole++;if(g.hole>=HOLES.length){const low=Math.min(...g.scores),leaders=g.scores.map((score,i)=>score===low?i:null).filter(i=>i!==null);g.phase='finished';g.winner=leaders.length===1?leaders[0]:null;return;}g.turn=0;setupHole(g);g.phase='aiming';return;}for(let i=1;i<=g.players;i++){const next=(g.turn+i)%g.players;if(active.some(d=>d.team===next)){if(next<=g.turn)g.round++;g.turn=next;g.phase='aiming';return;}}g.phase='finished';return;}
     if(g.mode==='coop'){if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);advance(g);return;}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}if(!advance(g))return;g.phase='counter';return;}
     if(g.mode==='royal'){g.board.inset=35+Math.max(0,g.round-1)*28;for(const o of g.objects)if(o.active&&(o.x-o.radius<g.board.inset||o.x+o.radius>W-g.board.inset||o.y-o.radius<g.board.inset||o.y+o.radius>H-g.board.inset))o.active=false;const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if(alive.size<=1){g.phase='finished';g.winner=[...alive][0]??null;return;}}
@@ -106,5 +125,5 @@
     const outcome=cooperative?(g.winner==null?'defeat':'victory'):solo?(g.winner==null?'defeat':'victory'):g.winner==null?'draw':'competitive-win';
     return {mode:g.mode,outcome,winner:g.winner,defeated:g.winner==null?[]:Array.from({length:g.players},(_,i)=>i).filter(i=>i!==g.winner)};
   }
-  return {MODES:['classic','football','line','golf','coop','royal','chain'],FORMATIONS,FIELD_GEOMETRY,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
+  return {MODES:['classic','football','line','golf','coop','royal','chain'],FORMATIONS,FIELD_GEOMETRY,LINE_LAYOUTS,lineMeasure,lineTarget,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
 });
