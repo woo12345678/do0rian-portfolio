@@ -1,0 +1,10 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const app = fs.readFileSync('games/ttak-club/v1.0.3/js/app.js', 'utf8');
+assert.match(app, /2인 기본 대전은 1번 팀이 아래, 2번 팀이 위/);
+assert.match(app, /3~5인 기본 대전은 각 팀이 판 둘레에 방사형/);
+assert.match(app, /Two-player Classic places Team 1 below Team 2/);
+assert.match(app, /three- to five-player Classic arranges every team radially/);
+assert.doesNotMatch(app, /기본 대전은 1번 팀이 아래, 2번 팀이 위에서 서로 마주 보는 세로 판/);
+assert.doesNotMatch(app, /In classic play, Team 1 starts below Team 2 on a vertical board/);
+console.log(JSON.stringify({ok:true}));

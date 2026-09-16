@@ -23,6 +23,7 @@
   function classicPlan(g,legal){
     let best=null;
     for(const disc of legal)for(const foe of g.objects.filter(o=>o.active&&o.team!==disc.team&&o.kind==='disc')){
+      if(g.players>2){const blocked=segmentBlocked(g,disc,foe),quality=-distance(disc,foe)-(blocked?2000:0);if(!best||quality>best.quality)best={disc,target:foe,quality};continue;}
       const attack=disc.team===0?-1:1;
       const forward=(foe.y-disc.y)*attack;
       if(forward<=0)continue;
@@ -101,7 +102,7 @@
     if(g.mode==='line')return R.lineTarget(g.board.targetLine,disc,25);
     if(g.mode==='golf')return g.board.cup;
     if(g.mode==='coop')return g.objects.filter(o=>o.active&&o.kind==='goblin').sort((a,b)=>Number(b.heavy)-Number(a.heavy))[0];
-    if(g.mode==='chain')return g.objects.find(o=>o.kind==='target'&&o.number===g.nextTarget);
+    if(g.mode==='chain')return g.objects.find(o=>o.kind==='target'&&o.number===1);
     if(g.mode==='royal')return foes.sort((a,b)=>distance(disc,a)-distance(disc,b))[0];
     return{x:600,y:360};
   }
@@ -127,7 +128,7 @@
       return shotToward(plan.disc,plan.target,profile.impactPower,profile,random);
     }
     if(g.mode==='chain'){
-      const target=g.objects.find(o=>o.active&&o.kind==='target'&&o.number===g.nextTarget);
+      const target=g.objects.find(o=>o.active&&o.kind==='target'&&o.number===1);
       if(target){const disc=legal.slice().sort((a,b)=>distance(a,target)-distance(b,target))[0];return shotToward(disc,target,profile.impactPower,profile,random);}
     }
     const disc=legal[0],target=objective(g,disc)||{x:600,y:360};

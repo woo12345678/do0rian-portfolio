@@ -51,17 +51,28 @@
     standard: () => Array.from({length:20},(_,i)=>({x:420+(i%5)*90,y:480+Math.floor(i/5)*60})),
     wedge: () => { const out=[]; for(let row=0;row<6;row++) for(let col=0;col<=row;col++) out.push({x:600+(col-row/2)*62,y:410+row*50}); return out; },
     wall: () => Array.from({length:20},(_,i)=>({x:330+(i%10)*60,y:570+Math.floor(i/10)*70})),
-    wings: () => Array.from({length:20},(_,i)=>{const side=i%2,slot=Math.floor(i/2);return{x:(side?750:330)+(slot%3)*60,y:500+Math.floor(slot/3)*60};})
+    wings: () => Array.from({length:20},(_,i)=>{const side=i%2,slot=Math.floor(i/2);return{x:(side?750:330)+(slot%3)*60,y:500+Math.floor(slot/3)*55};})
   };
   function formationPoints(id='standard',count=5){
     const formation=Object.hasOwn(FORMATIONS,id)?id:'standard';
     return grids[formation]().slice(0,Math.max(1,Math.min(20,count))).map(point=>Object.freeze({...point}));
   }
-  function classicPieces(count,formation){
+  function classicPieces(count,formation,players=2){
     const bottom=formationPoints(formation,count),out=[];
-    for(const point of bottom)out.push(disc(0,point.x,point.y));
-    for(const point of bottom)out.push(disc(1,point.x,H-point.y));
+    if(players===1){for(const point of bottom)out.push(disc(0,point.x,point.y));return out;}
+    if(players===2){for(const point of bottom)out.push(disc(0,point.x,point.y));for(const point of bottom)out.push(disc(1,point.x,H-point.y));return out;}
+    const candidates=[];for(let row=0;row<10;row++)for(let column=0;column<10;column++)candidates.push({x:312+column*64,y:72+row*64});
+    for(let index=0;index<count;index++)for(let team=0;team<players;team++){
+      const angle=-Math.PI/2+team*Math.PI*2/players,rx=Math.cos(angle),ry=Math.sin(angle),tx=-ry,ty=rx;
+      const quality=point=>{const radial=(point.x-600)*rx+(point.y-360)*ry,signedTangent=(point.x-600)*tx+(point.y-360)*ty,tangent=Math.abs(signedTangent);if(formation==='wedge')return radial-Math.abs(signedTangent-48)*.65;if(formation==='wall')return radial*.72+tangent*.34+signedTangent*.02;if(formation==='wings')return radial*.48+tangent-signedTangent*.04;return radial-tangent*.08;};
+      candidates.sort((a,b)=>quality(b)-quality(a));
+      const point=candidates.shift();out.push(disc(team,point.x,point.y));
+    }
     return out;
+  }
+  function lineSpawnPoints(layout,players){
+    const center=layout.spawns.reduce((sum,point)=>({x:sum.x+point.x/layout.spawns.length,y:sum.y+point.y/layout.spawns.length}),{x:0,y:0}),dx=layout.b.x-layout.a.x,dy=layout.b.y-layout.a.y,length=Math.hypot(dx,dy)||1,spacing=54;
+    return Array.from({length:players},(_,index)=>{const offset=(index-(players-1)/2)*spacing;return{x:center.x+dx/length*offset,y:center.y+dy/length*offset};});
   }
   function rows(players, count, radius=25) {
     const out=[];
@@ -77,22 +88,37 @@
     }
     return out;
   }
+  function trickPositions(center,angle,bend=0){
+    const spacing=76,dx=Math.cos(angle),dy=Math.sin(angle),px=-dy,py=dx;
+    return Array.from({length:5},(_,index)=>{const along=(index-2)*spacing,curve=(index===2?0:Math.abs(index-2)*bend);return{x:center.x+dx*along+px*curve,y:center.y+dy*along+py*curve};});
+  }
+  function trickTargetPositions(random=Math.random,rotation=0){return trickPositions({x:600+(random()-.5)*320,y:360+(random()-.5)*210},random()*Math.PI*2+rotation,(random()-.5)*22);}
+  function placeTrickTargets(g,increment=false){
+    const discs=g.objects.filter(object=>object.active&&object.kind==='disc'),clear=candidate=>candidate.every(position=>position.x>=32&&position.x<=W-32&&position.y>=32&&position.y<=H-32&&discs.every(disc=>Math.hypot(position.x-disc.x,position.y-disc.y)>=28+disc.radius+8));let positions;
+    for(let attempt=0;attempt<18&&!positions;attempt++){const candidate=trickTargetPositions(g.trickRandom,attempt*.73);if(clear(candidate))positions=candidate;}
+    if(!positions)for(let y=100;y<=620&&!positions;y+=65)for(let x=210;x<=990&&!positions;x+=65)for(const angle of [0,Math.PI/2,Math.PI/4,-Math.PI/4]){const candidate=trickPositions({x,y},angle);if(clear(candidate)){positions=candidate;break;}}
+    if(!positions)throw new Error('Unable to place trick-shot targets without overlap');
+    const targets=g.objects.filter(object=>object.kind==='target');
+    for(let index=0;index<5;index++){let target=targets[index];if(!target){target=P.body({id:`t${index+1}`,kind:'target',number:index+1,radius:28,mass:.78,friction:.55});g.objects.push(target);}Object.assign(target,positions[index],{vx:0,vy:0,active:true});}
+    if(increment)g.targetResetCount++;
+  }
   function createGame(opts={}) {
-    serial=0; const mode=opts.mode||'classic', requestedPlayers=Math.max(1,Math.min(4,opts.players||2)), players=['classic','football','line'].includes(mode)?2:requestedPlayers, s=opts.settings||{};
+    serial=0; const mode=opts.mode||'classic', requestedPlayers=Math.max(1,Math.min(5,opts.players||2)), players=mode==='football'?2:requestedPlayers, s=opts.settings||{};
     const settings={...s};
     if(mode==='classic')settings.formation=Object.hasOwn(FORMATIONS,s.formation)?s.formation:'standard';
-    const g={mode,players,settings,phase:'aiming',turn:0,round:1,shot:0,winner:null,scores:Array(players).fill(0),objects:[],board:{width:W,height:H,walls:false,orientation:'vertical'},events:[]};
-    if(mode==='classic'){g.board.geometry=FIELD_GEOMETRY.classic;g.board.playfield=FIELD_GEOMETRY.classic.frame;g.board.surface='baduk';g.objects=classicPieces(Math.max(1,Math.min(20,s.discs||5)),settings.formation);}
+    const firstTurn=s.firstPlayer==='ai'?Math.min(1,players-1):s.firstPlayer==='random'?Math.min(players-1,Math.floor(Math.max(0,Math.min(.999999,Number((typeof opts.rng==='function'?opts.rng:Math.random)())||0))*players)):0;
+    const g={mode,players,settings,phase:'aiming',turn:firstTurn,round:1,shot:0,winner:null,scores:Array(players).fill(0),objects:[],board:{width:W,height:H,walls:false,orientation:'vertical'},events:[]};
+    if(mode==='classic'){g.board.geometry=FIELD_GEOMETRY.classic;g.board.playfield=FIELD_GEOMETRY.classic.frame;g.board.surface='baduk';g.objects=classicPieces(Math.max(1,Math.min(20,s.discs||5)),settings.formation,players);}
     if(mode==='football'){g.board.walls=true;g.board.geometry=FIELD_GEOMETRY.football;g.board.playfield=FIELD_GEOMETRY.football.touchline;g.board.goals={...FIELD_GEOMETRY.football.goals};g.board.surface='grass';g.objects=verticalRows(players,3,23);g.objects.push(P.body({id:'ball',kind:'ball',x:600,y:360,radius:20,mass:.65}));}
-    if(mode==='line'){const layout=chooseLineLayout(opts.rng,s.lineLayout),safeSign=Math.sign(lineCross(layout,layout.spawns[0]))||1;g.board={width:W,height:H,walls:true,orientation:'vertical',targetLine:{id:layout.id,kind:layout.kind,a:{...layout.a},b:{...layout.b},safeSign}};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=Array.from({length:players},(_,t)=>{const spawn=layout.spawns[t%layout.spawns.length];return disc(t,spawn.x,spawn.y);});}
+    if(mode==='line'){const layout=chooseLineLayout(opts.rng,s.lineLayout),safeSign=Math.sign(lineCross(layout,layout.spawns[0]))||1,spawns=lineSpawnPoints(layout,players);g.board={width:W,height:H,walls:true,orientation:'vertical',targetLine:{id:layout.id,kind:layout.kind,a:{...layout.a},b:{...layout.b},safeSign}};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=spawns.map((spawn,t)=>disc(t,spawn.x,spawn.y));}
     if(mode==='golf'){g.board.walls=true;g.hole=0; setupHole(g);}
-    if(mode==='coop'){g.players=players;g.turnBudget=12;g.wave=1;spawnCoop(g);}
+    if(mode==='coop'){g.players=players;g.turnBudget=12;g.wave=1;g.counterInterval=({easy:5,normal:4,hard:3})[s.difficulty]||4;g.turnsUntilCounter=g.counterInterval;spawnCoop(g);}
     if(mode==='royal'){g.board.walls=true;g.board.inset=35;g.objects=rows(players,s.discs||3,23);}
-    if(mode==='chain'){g.board.walls=true;g.nextTarget=1;g.combo=0;g.turnLimit=s.turnLimit||18;g.coop=!!s.coop;g.objects=rows(players,1);for(let n=1;n<=5;n++)g.objects.push(P.body({id:`t${n}`,kind:'target',number:n,x:350+n*105,y:180+(n%2)*330,radius:30,mass:20}));}
+    if(mode==='chain'){g.board={width:W,height:H,walls:true,orientation:'vertical',friction:.65,restitution:.96};g.resetEvery=Math.max(1,Number(s.resetTurns)||players*2);g.shotsSinceReset=0;g.targetResetCount=0;g.lastSequence=[];g.trickRandom=typeof opts.rng==='function'?opts.rng:Math.random;g.objects=rows(players,1).map(object=>Object.assign(object,{friction:.55}));placeTrickTargets(g);}
     return g;
   }
-  function setupHole(g){const h=HOLES[g.hole];g.board={width:W,height:H,walls:true,orientation:'vertical',surface:'golf',cup:{...h.cup},puttingGreen:h.puttingGreen,fairway:h.fairway,bunkers:h.bunkers,rocks:h.rocks,rough:h.rough,holeName:h.name};g.objects=Array.from({length:g.players},(_,t)=>disc(t,h.tee.x,h.tee.y+t*45));g.objects.push(...h.rocks.map((r,i)=>P.body({id:`rock${g.hole}-${i}`,kind:'rock',x:r.x,y:r.y,radius:r.r,mass:1000})));}
-  function spawnCoop(g){g.board={width:W,height:H,walls:false};g.objects=Array.from({length:g.players},(_,t)=>disc(t,160,250+t*70));for(let i=0;i<2+g.wave;i++)g.objects.push(P.body({id:`g${g.wave}-${i}`,kind:'goblin',team:-1,x:720+i*75,y:230+(i%3)*120,radius:i===0?34:27,mass:i===0?2.5:1,heavy:i===0}));}
+  function setupHole(g){const h=HOLES[g.hole];g.board={width:W,height:H,walls:true,orientation:'vertical',surface:'golf',cup:{...h.cup},puttingGreen:h.puttingGreen,fairway:h.fairway,bunkers:h.bunkers,rocks:h.rocks,rough:h.rough,holeName:h.name};g.objects=Array.from({length:g.players},(_,t)=>disc(t,h.tee.x,h.tee.y+(t-(g.players-1)/2)*58));g.objects.push(...h.rocks.map((r,i)=>P.body({id:`rock${g.hole}-${i}`,kind:'rock',x:r.x,y:r.y,radius:r.r,mass:1000})));}
+  function spawnCoop(g){g.board={width:W,height:H,walls:false};g.turnsUntilCounter=g.counterInterval;g.objects=Array.from({length:g.players},(_,t)=>disc(t,160,250+t*70));for(let i=0;i<2+g.wave;i++)g.objects.push(P.body({id:`g${g.wave}-${i}`,kind:'goblin',team:-1,x:720+i*75,y:230+(i%3)*120,radius:i===0?34:27,mass:i===0?2.5:1,heavy:i===0}));}
   function eligibleObjects(g, player=g.turn){
     if(g.phase!=='aiming')return[];
     if(g.mode==='coop')return g.objects.filter(o=>o.active&&o.kind==='disc'&&o.team===player);
@@ -108,19 +134,19 @@
   }
   function ensureActiveTurn(g){if(activeTeams(g).has(g.turn)){g.phase='aiming';return true;}return advance(g);}
   function resolve(g,events=[]){events=P.accumulateEvents([],events);g.phase='resolution';g.events=events;
-    if(g.mode==='coop'&&g.counterActive){g.counterActive=false;if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}ensureActiveTurn(g);return;}
-    if(g.mode==='classic'){const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if(alive.size<=1){g.phase='finished';g.winner=[...alive][0]??null;return;}}
+    if(g.mode==='coop'&&g.counterActive){g.counterActive=false;g.turnsUntilCounter=g.counterInterval;if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}ensureActiveTurn(g);return;}
+    if(g.mode==='classic'){const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if((g.players===1&&alive.size===0)||(g.players>1&&alive.size<=1)){g.phase='finished';g.winner=g.players>1?([...alive][0]??null):null;return;}}
     if(g.mode==='football'){for(const e of events.filter(e=>e.type==='goal')){const scorer=e.side==='top'?0:1;g.scores[scorer]++;const ball=g.objects.find(o=>o.kind==='ball');Object.assign(ball,{x:600,y:360,vx:0,vy:0,active:true});if(g.scores[scorer]>=Math.max(1,g.settings.targetScore||3)){g.winner=scorer;g.phase='finished';return;}}}
     if(g.mode==='line'){g.attempts[g.turn].push({complete:true});if(g.attempts.every(a=>a.length>=1)){g.attempts=g.attempts.map((_,team)=>{const o=g.objects.find(d=>d.kind==='disc'&&d.team===team),measurement=o&&o.active?lineMeasure(g.board.targetLine,o):null,legal=!!measurement?.legal;return[{legal,distance:legal?measurement.distance:null}]});const best=Math.min(...g.attempts.flat().filter(v=>v.legal).map(v=>v.distance),Infinity);const leaders=g.attempts.map((a,i)=>a.some(v=>v.legal&&Math.abs(v.distance-best)<1e-6)?i:null).filter(i=>i!==null);g.winner=leaders.length===1?leaders[0]:null;g.phase='finished';return;}}
     if(g.mode==='golf'){const o=g.objects.find(o=>o.kind==='disc'&&o.team===g.turn);const sunk=events.some(e=>e.type==='cup'&&e.team===g.turn)||(!o?.active||Math.hypot(o.x-g.board.cup.x,o.y-g.board.cup.y)<g.board.cup.r);if(sunk&&o){o.active=false;o.vx=o.vy=0;}const active=g.objects.filter(d=>d.kind==='disc'&&d.active);if(sunk&&!active.length){g.hole++;if(g.hole>=HOLES.length){const low=Math.min(...g.scores),leaders=g.scores.map((score,i)=>score===low?i:null).filter(i=>i!==null);g.phase='finished';g.winner=leaders.length===1?leaders[0]:null;return;}g.turn=0;setupHole(g);g.phase='aiming';return;}for(let i=1;i<=g.players;i++){const next=(g.turn+i)%g.players;if(active.some(d=>d.team===next)){if(next<=g.turn)g.round++;g.turn=next;g.phase='aiming';return;}}g.phase='finished';return;}
-    if(g.mode==='coop'){if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);advance(g);return;}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}if(!advance(g))return;g.phase='counter';return;}
-    if(g.mode==='royal'){g.board.inset=35+Math.max(0,g.round-1)*28;for(const o of g.objects)if(o.active&&(o.x-o.radius<g.board.inset||o.x+o.radius>W-g.board.inset||o.y-o.radius<g.board.inset||o.y+o.radius>H-g.board.inset))o.active=false;const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if(alive.size<=1){g.phase='finished';g.winner=[...alive][0]??null;return;}}
-    if(g.mode==='chain'){for(const e of events.filter(e=>e.type==='target'))if(e.number===g.nextTarget){g.scores[e.team]++;g.nextTarget++;g.combo++;}else g.combo=0;if(g.nextTarget>5){g.phase='finished';if(g.coop)g.winner=0;else{const high=Math.max(...g.scores),leaders=g.scores.map((score,index)=>score===high?index:null).filter(index=>index!==null);g.winner=leaders.length===1?leaders[0]:null;}return;}if(g.shot>=g.turnLimit){g.phase='finished';g.winner=null;if(!g.coop){const high=Math.max(...g.scores),leaders=g.scores.map((score,index)=>score===high?index:null).filter(index=>index!==null);if(leaders.length===1)g.winner=leaders[0];}return;}}
+    if(g.mode==='coop'){if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);advance(g);return;}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}if(!advance(g))return;g.turnsUntilCounter--;if(g.turnsUntilCounter<=0)g.phase='counter';return;}
+    if(g.mode==='royal'){g.board.inset=35+Math.max(0,g.round-1)*28;for(const o of g.objects)if(o.active&&(o.x-o.radius<g.board.inset||o.x+o.radius>W-g.board.inset||o.y-o.radius<g.board.inset||o.y+o.radius>H-g.board.inset))o.active=false;const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if((g.players===1&&alive.size===0)||(g.players>1&&alive.size<=1)){g.phase='finished';g.winner=g.players>1?([...alive][0]??null):null;return;}}
+    if(g.mode==='chain'){const sequence=events.filter(event=>event.type==='target').map(event=>event.number);let prefix=0;for(const number of sequence){if(number===prefix+1)prefix++;else break;}const exact=sequence.length===5&&prefix===5;g.lastSequence=sequence;g.scores[g.turn]=Math.max(g.scores[g.turn],exact?5:Math.min(prefix,4));if(exact){g.winner=g.turn;g.phase='finished';return;}g.shotsSinceReset++;if(g.shotsSinceReset>=g.resetEvery){g.shotsSinceReset=0;placeTrickTargets(g,true);}}
     advance(g);
   }
   function adjudicate(g){
     if(g.phase!=='finished')return null;
-    const cooperative=g.mode==='coop'||(g.mode==='chain'&&g.coop);
+    const cooperative=g.mode==='coop';
     const solo=g.players===1;
     const outcome=cooperative?(g.winner==null?'defeat':'victory'):solo?(g.winner==null?'defeat':'victory'):g.winner==null?'draw':'competitive-win';
     return {mode:g.mode,outcome,winner:g.winner,defeated:g.winner==null?[]:Array.from({length:g.players},(_,i)=>i).filter(i=>i!==g.winner)};

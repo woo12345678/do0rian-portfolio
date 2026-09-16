@@ -13,9 +13,9 @@
     o.vx = force.x / m * speed; o.vy = force.y / m * speed;
   }
   const eventKey = e => [e.type,e.id,e.side,e.number,e.team].map(value=>value??'').join('|');
-  function accumulateEvents(pending=[],events=[]){const keys=new Set(pending.map(eventKey));for(const event of events){const key=eventKey(event);if(!keys.has(key)){pending.push(event);keys.add(key);}}return pending;}
+  function accumulateEvents(pending=[],events=[]){const keys=new Set(pending.filter(event=>event.type!=='target').map(eventKey));for(const event of events){if(event.type==='target'){pending.push(event);continue;}const key=eventKey(event);if(!keys.has(key)){pending.push(event);keys.add(key);}}return pending;}
   function consumeEvents(state){const events=state.pendingEvents||[];state.pendingEvents=[];return events;}
-  function collide(a, b, events) {
+  function collide(a, b, events, restitution=RESTITUTION) {
     const dx = b.x - a.x, dy = b.y - a.y, min = a.radius + b.radius, d = Math.hypot(dx, dy);
     if (d >= min || d === 0) return;
     const nx = dx / d, ny = dy / d, overlap = min - d, total = a.mass + b.mass;
@@ -23,32 +23,32 @@
     b.x += nx * overlap * a.mass / total; b.y += ny * overlap * a.mass / total;
     const rel = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
     if (rel < 0) {
-      const impulse = -(1 + RESTITUTION) * rel / (1 / a.mass + 1 / b.mass);
+      const impulse = -(1 + restitution) * rel / (1 / a.mass + 1 / b.mass);
       a.vx -= impulse * nx / a.mass; a.vy -= impulse * ny / a.mass;
       b.vx += impulse * nx / b.mass; b.vy += impulse * ny / b.mass;
       events.push({ type: b.kind === 'target' ? 'target' : a.kind === 'target' ? 'target' : 'impact', id: b.kind === 'target' ? b.id : a.kind === 'target' ? a.id : undefined, number: b.number || a.number, team: a.team ?? b.team, x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, strength: Math.abs(rel) });
     }
   }
   function step(objects, dt, board) {
-    const events = [], walls = board.walls !== false, open = board.openEdges || {}, inset = board.inset || 0;
+    const events = [], walls = board.walls !== false, open = board.openEdges || {}, inset = board.inset || 0, restitution=board.restitution??RESTITUTION;
     const bounds = board.playfield || {x:inset,y:inset,w:board.width-inset*2,h:board.height-inset*2};
     const left=bounds.x,right=bounds.x+bounds.w,top=bounds.y,bottom=bounds.y+bounds.h;
     const emit = event => accumulateEvents(events,[event]);
     const constrain = o => {
       if (!o.active) return;
       if (walls) {
-        if (open.left ? o.x + o.radius <= left : o.x - o.radius < left) { if(open.left){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;} o.x = left + o.radius; o.vx = Math.abs(o.vx) * RESTITUTION; }
-        if (open.right ? o.x - o.radius >= right : o.x + o.radius > right) { if(open.right){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;} o.x = right - o.radius; o.vx = -Math.abs(o.vx) * RESTITUTION; }
+        if (open.left ? o.x + o.radius <= left : o.x - o.radius < left) { if(open.left){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;} o.x = left + o.radius; o.vx = Math.abs(o.vx) * restitution; }
+        if (open.right ? o.x - o.radius >= right : o.x + o.radius > right) { if(open.right){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;} o.x = right - o.radius; o.vx = -Math.abs(o.vx) * restitution; }
         const goalMouth = board.goals && o.kind === 'ball' && o.x > board.goals.x1 && o.x < board.goals.x2;
         if (open.top ? o.y + o.radius <= top : o.y - o.radius < top) {
           if(open.top){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;}
           if (goalMouth) emit({ type: 'goal', side: 'top', id: o.id });
-          else { o.y = top + o.radius; o.vy = Math.abs(o.vy) * RESTITUTION; }
+          else { o.y = top + o.radius; o.vy = Math.abs(o.vy) * restitution; }
         }
         if (open.bottom ? o.y - o.radius >= bottom : o.y + o.radius > bottom) {
           if(open.bottom){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;}
           if (goalMouth) emit({ type: 'goal', side: 'bottom', id: o.id });
-          else { o.y = bottom - o.radius; o.vy = -Math.abs(o.vy) * RESTITUTION; }
+          else { o.y = bottom - o.radius; o.vy = -Math.abs(o.vy) * restitution; }
         }
       } else if (o.x + o.radius <= left || o.x - o.radius >= right || o.y + o.radius <= top || o.y - o.radius >= bottom) {
         o.active = false; o.vx = o.vy = 0; emit({ type: 'out', id: o.id, team: o.team });
@@ -67,7 +67,7 @@
       constrain(o);
     }
     const active = objects.filter(o => o.active);
-    for (let i = 0; i < active.length; i++) for (let j = i + 1; j < active.length; j++) collide(active[i], active[j], events);
+    for (let i = 0; i < active.length; i++) for (let j = i + 1; j < active.length; j++) collide(active[i], active[j], events, restitution);
     for (const o of objects) constrain(o);
     return events;
   }
