@@ -1,11 +1,12 @@
 (function(root,factory){const api=factory(typeof require==='function'?require('./rules'):root.TtakRules,typeof require==='function'?require('./physics'):root.TtakPhysics);if(typeof module==='object'&&module.exports)module.exports=api;else root.TtakAI=api;})(typeof globalThis!=='undefined'?globalThis:this,function(R,P){
   'use strict';
   const PROFILES={
-    easy:{jitter:.34,classicPower:760,footballPower:820,impactPower:800},
-    normal:{jitter:.12,classicPower:1050,footballPower:1100,impactPower:1050},
-    hard:{jitter:.035,classicPower:1325,footballPower:1400,impactPower:1375}
+    easy:{jitter:.34,classicPower:760,footballPower:820,impactPower:800,lineMin:22,lineSpread:46},
+    normal:{jitter:.12,classicPower:1050,footballPower:1100,impactPower:1050,lineMin:12,lineSpread:30},
+    hard:{jitter:.035,classicPower:1325,footballPower:1400,impactPower:1375,lineMin:7,lineSpread:20}
   };
   function rng(seed=Date.now()){let x=seed|0;return()=>{x^=x<<13;x^=x>>>17;x^=x<<5;return(x>>>0)/4294967296;};}
+  function mixedSeed(seed,team){let x=((seed==null?Date.now():Number(seed))|0)^Math.imul((team+1)|0,0x9e3779b1);x^=x>>>16;x=Math.imul(x,0x85ebca6b);x^=x>>>13;x=Math.imul(x,0xc2b2ae35);return(x^(x>>>16))>>>0;}
   const distance=(a,b)=>Math.hypot(b.x-a.x,b.y-a.y);
   function segmentBlocked(g,a,b,ignore){
     const dx=b.x-a.x,dy=b.y-a.y,length2=dx*dx+dy*dy||1;
@@ -48,7 +49,8 @@
     return best;
   }
   function lineShot(g,disc,profile,random){
-    const target=R.lineTarget(g.board.targetLine,disc,24);
+    const safety=profile.lineMin+profile.lineSpread*random();
+    const target=R.lineTarget(g.board.targetLine,disc,safety);
     const travel=distance(disc,target),friction=g.board.friction||1.65,dt=1/120;
     const travelPerSpeed=dt/(1-Math.exp(-friction*dt));
     const power=travel/travelPerSpeed+P.REST_SPEED;
@@ -108,7 +110,7 @@
   }
   function chooseShot(g,difficulty='normal',seed){
     const legal=R.eligibleObjects(g);if(!legal.length)return null;
-    const profile=PROFILES[difficulty]||PROFILES.normal,random=rng(seed);
+    const profile=PROFILES[difficulty]||PROFILES.normal,random=rng(mixedSeed(seed,g.turn));
     if(g.mode==='classic'){
       const plan=classicPlan(g,legal);
       if(plan)return shotToward(plan.disc,plan.target,profile.classicPower,profile,random);

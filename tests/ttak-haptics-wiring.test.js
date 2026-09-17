@@ -10,4 +10,5 @@ assert.match(app,/haptics\.trigger\('impact',e\.strength\)/);
 assert.match(app,/haptics\.trigger\(e\.type\)/);
 assert.match(app,/haptics\.trigger\('line'\)/);
 assert.match(sw,/\.\/shared\/haptics\.js/);
+assert(sw.includes("ttak-static-v1.0.3-ai-variance-11"),'service worker cache version must refresh for AI variance');
 console.log(JSON.stringify({ok:true}));
