@@ -1,0 +1,13 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const base='games/ttak-club/v1.0.3/';
+const index=fs.readFileSync(base+'index.html','utf8');
+const app=fs.readFileSync(base+'js/app.js','utf8');
+const sw=fs.readFileSync(base+'sw.js','utf8');
+assert.ok(index.indexOf('./shared/haptics.js')<index.indexOf('./js/app.js'),'haptics must load before app');
+assert.match(app,/TtakHaptics\.create\(window\)/);
+assert.match(app,/haptics\.trigger\('impact',e\.strength\)/);
+assert.match(app,/haptics\.trigger\(e\.type\)/);
+assert.match(app,/haptics\.trigger\('line'\)/);
+assert.match(sw,/\.\/shared\/haptics\.js/);
+console.log(JSON.stringify({ok:true}));
