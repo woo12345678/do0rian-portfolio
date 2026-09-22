@@ -77,7 +77,9 @@ assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echo
   assert.strictEqual(info.testCount, testCount);
   const runtimeFiles = expectedFiles.filter(file => file !== 'build-info.json').sort();
   const inventory = crypto.createHash('sha256').update(runtimeFiles.map(file => {
-    const fileSha = crypto.createHash('sha256').update(fs.readFileSync(path.join(releaseDir, file))).digest('hex');
+    // GitHub Pages serves LF-normalized Git blobs; remove checkout-only carriage returns.
+    const releaseBytes = fs.readFileSync(path.join(releaseDir, file), 'utf8').split(String.fromCharCode(13)).join('');
+    const fileSha = crypto.createHash('sha256').update(releaseBytes).digest('hex');
     return `${fileSha}  ${file}\n`;
   }).join('')).digest('hex');
   assert.strictEqual(inventory, info.inventorySha256, `${project.id}: runtime inventory SHA-256가 일치해야 합니다.`);
@@ -131,20 +133,21 @@ assert.deepStrictEqual(listFiles(ttakReleaseDir).sort(), ttakReleaseFiles);
 const ttakBuildInfo = JSON.parse(fs.readFileSync(path.join(ttakReleaseDir, 'build-info.json'), 'utf8'));
 assert.deepStrictEqual(ttakBuildInfo, {
   version: '1.0.3',
-  sourceSha: 'd148faa76c4e6b72cf703f5b08b5b22dc297fbf8',
+  sourceSha: '6fa828c92869532b1dac99e7b6e6373e28da64cd',
   edition: 'static-single-local',
   online: false,
   testCount: 119,
-  inventorySha256: '14aa92edbc11a5a26a7b174f662ce538593eadc2cf429fc774931f3db8a13139'
+  inventorySha256: '6121c8847d2958dd73961bfceecf9db562f00c04085561e100975044a9b5b705'
 });
 const ttakRuntimeFiles = ttakReleaseFiles.filter(file => file !== 'build-info.json' && !file.endsWith('.zip')).sort();
 const ttakInventory = crypto.createHash('sha256').update(ttakRuntimeFiles.map(file => {
-  const fileSha = crypto.createHash('sha256').update(fs.readFileSync(path.join(ttakReleaseDir, file))).digest('hex');
+  const releaseBytes = fs.readFileSync(path.join(ttakReleaseDir, file), 'utf8').split(String.fromCharCode(13)).join('');
+  const fileSha = crypto.createHash('sha256').update(releaseBytes).digest('hex');
   return `${fileSha}  ${file}\n`;
 }).join('')).digest('hex');
 assert.strictEqual(ttakInventory, ttakBuildInfo.inventorySha256, 'deployed TTAK runtime files must match the verified inventory');
 const ttakZip = fs.readFileSync(path.join(ttakReleaseDir, 'TTAK-Table-Club-v1.0.3-itch.zip'));
-assert.strictEqual(crypto.createHash('sha256').update(ttakZip).digest('hex'), 'bdeb21426bfa002c21a34145daa796291b89232b60f0cad65e8ac9958eeb7cc5');
+assert.strictEqual(crypto.createHash('sha256').update(ttakZip).digest('hex'), '051c88475bdc072d8ad2ab61013e505436416d407af843763ce3a5447a16d6bd');
 const ttakReleaseIndex = fs.readFileSync(path.join(ttakReleaseDir, 'index.html'), 'utf8');
 ['./manifest.webmanifest', './css/style.css', './css/pigments.css', './shared/physics.js', './shared/rules.js', './shared/ai.js', './js/app.js']
   .forEach(asset => assert(ttakReleaseIndex.includes(asset), `TTAK release index must use relative asset ${asset}`));
