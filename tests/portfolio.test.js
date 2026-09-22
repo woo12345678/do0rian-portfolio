@@ -7,11 +7,11 @@ const projects = require('../projects.js');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 
-assert.strictEqual(projects.length, 27, '포트폴리오에는 현재 27개 프로젝트가 있어야 합니다.');
+assert.strictEqual(projects.length, 29, '포트폴리오에는 현재 29개 프로젝트가 있어야 합니다.');
 assert.strictEqual(new Set(projects.map(p => p.id)).size, projects.length, '프로젝트 ID는 고유해야 합니다.');
 projects.forEach(project => {
   ['id', 'title', 'url', 'image', 'kind', 'summary'].forEach(key => assert(project[key], `${project.id || 'project'}: ${key} 필드가 필요합니다.`));
-  assert(/^https:\/\//.test(project.url) || project.id === 'ttak-club', `${project.id}: 공개 HTTPS 링크가 필요합니다.`);
+  assert(/^https:\/\//.test(project.url) || /^[a-z0-9-]+\.html$/.test(project.url) || /^games\/[a-z0-9-]+\/(?:v\d+\.\d+\.\d+|[a-f0-9]+)\/$/.test(project.url), `${project.id}: 공개 HTTPS 또는 안전한 로컬 포트폴리오 링크가 필요합니다.`);
   assert(Array.isArray(project.tags) && project.tags.length, `${project.id}: 태그가 필요합니다.`);
   assert(fs.existsSync(path.join(root, project.image)), `${project.id}: 대표 이미지 파일이 실제로 존재해야 합니다.`);
 });
@@ -30,7 +30,9 @@ assert(/31/.test(realDrive.impact) && /6/.test(realDrive.impact) && /수리비/.
 assert(realDrive.tags.includes('Vehicle Damage') && realDrive.tags.includes('Open World'), '핵심 게임 시스템 태그가 필요합니다.');
 const ttakClub = projects.find(p => p.id === 'ttak-club');
 const echoFront = projects.find(p => p.id === 'echo-front');
-assert.deepStrictEqual(projects.slice(3, 6).map(p => p.id), ['realdrive-horizon', 'ttak-club', 'echo-front'], '두 게임은 RealDrive 바로 다음, 비게임 프로젝트 전에 정확한 순서로 있어야 합니다.');
+const vaultClick = projects.find(p => p.id === 'vault-click');
+const stitchkeeper = projects.find(p => p.id === 'stitchkeeper');
+assert.deepStrictEqual(projects.slice(3, 8).map(p => p.id), ['realdrive-horizon', 'ttak-club', 'echo-front', 'vault-click', 'stitchkeeper'], '네 게임은 RealDrive 바로 다음, 비게임 프로젝트 전에 정확한 순서로 있어야 합니다.');
 [
   [ttakClub, 'games/ttak-club/v1.0.3/', 'assets/projects/ttak-club-home.png', /7 Modes/, /119\/119/],
   [echoFront, 'https://woo12345678.github.io/do0rian-portfolio/echo-front.html', 'assets/projects/echo-front.png', /52 Heroes.*9 Modes.*11 Maps/, /96\/96/]
@@ -48,6 +50,60 @@ assert(/LOCAL BUILD/.test(echoFront.platform) && /SERVER REQUIRED/.test(echoFron
 assert(/online rooms require (?:the )?server build/i.test(ttakClub.summary));
 assert(/결정론적/.test(ttakClub.summary) && /Canvas 2D/.test(ttakClub.role) && /Socket\.IO/.test(ttakClub.role));
 assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echoFront.summary) && /Three\.js/.test(echoFront.role));
+
+[
+  [vaultClick, 'vault-click.html', 'games/vault-click/v1.0.0/', 'assets/projects/vault-click-game.png', 18, '9f711a17821fa87a4e9a7ab20624bf3f553ce77b'],
+  [stitchkeeper, 'stitchkeeper.html', 'games/stitchkeeper/v1.0.0/', 'assets/projects/stitchkeeper-game.png', 12, 'ff2062a4726c9050454bc596651035e767e9f79c']
+].forEach(([project, detailUrl, playUrl, image, testCount, sourceSha]) => {
+  assert(project, `${detailUrl}: 프로젝트가 필요합니다.`);
+  assert.strictEqual(project.url, detailUrl, `${project.id}: 카드가 상세 페이지를 열어야 합니다.`);
+  assert.strictEqual(project.playUrl, playUrl, `${project.id}: 검증된 정적 런타임 URL을 별도 보존해야 합니다.`);
+  assert.strictEqual(project.image, image);
+  assert.strictEqual(project.kind, 'game');
+  assert.strictEqual(project.collaboration, true);
+  assert(!project.featured, `${project.id}: non-featured 게임이어야 합니다.`);
+  assert(/BROWSER/.test(project.platform) && /STATIC SINGLE/.test(project.platform) && /OFFLINE/.test(project.platform));
+  assert(new RegExp(`${testCount}/${testCount} Tests PASS`, 'i').test(project.impact));
+  assert(/Canvas 2D/.test(project.role) && /authored procedural visuals/i.test(project.role));
+  const releaseDir = path.join(root, playUrl);
+  const expectedFiles = project.id === 'vault-click'
+    ? ['build-info.json', 'index.html', 'src/game.js', 'src/rules.mjs', 'styles.css']
+    : ['build-info.json', 'game-rules.js', 'game.js', 'index.html', 'styles.css'];
+  assert.deepStrictEqual(listFiles(releaseDir).sort(), expectedFiles, `${project.id}: 공개 파일 allowlist가 정확해야 합니다.`);
+  const info = JSON.parse(fs.readFileSync(path.join(releaseDir, 'build-info.json'), 'utf8'));
+  assert.strictEqual(info.sourceSha, sourceSha);
+  assert.strictEqual(info.edition, 'static-single');
+  assert.strictEqual(info.online, false);
+  assert.strictEqual(info.testCount, testCount);
+  const runtimeFiles = expectedFiles.filter(file => file !== 'build-info.json').sort();
+  const inventory = crypto.createHash('sha256').update(runtimeFiles.map(file => {
+    const fileSha = crypto.createHash('sha256').update(fs.readFileSync(path.join(releaseDir, file))).digest('hex');
+    return `${fileSha}  ${file}\n`;
+  }).join('')).digest('hex');
+  assert.strictEqual(inventory, info.inventorySha256, `${project.id}: runtime inventory SHA-256가 일치해야 합니다.`);
+  const releaseIndex = fs.readFileSync(path.join(releaseDir, 'index.html'), 'utf8');
+  const refs = [...releaseIndex.matchAll(/(?:src|href)=["']([^"']+)["']/g)].map(match => match[1]);
+  refs.filter(ref => !ref.startsWith('data:')).forEach(ref => {
+    assert(!ref.startsWith('/') && !/^https?:/i.test(ref), `${project.id}: asset reference must be relative: ${ref}`);
+  });
+});
+
+[
+  [vaultClick, 'vault-click.html', 'vault-title', 18, ['assets/projects/vault-click-game.png', 'assets/projects/vault-click-title.png']],
+  [stitchkeeper, 'stitchkeeper.html', 'stitchkeeper-title', 12, ['assets/projects/stitchkeeper-game.png', 'assets/projects/stitchkeeper-title.png']]
+].forEach(([project, file, titleId, testCount, images]) => {
+  const detail = fs.readFileSync(path.join(root, file), 'utf8');
+  assert.strictEqual(project.url, file, `${file}: production card inbound link가 필요합니다.`);
+  assert(/<main/.test(detail) && new RegExp(`<h1[^>]*id="${titleId}"`).test(detail));
+  assert(/meta name="description"/.test(detail));
+  assert(detail.includes(`href="${project.playUrl}"`) && /PLAY PUBLIC WEB BUILD/.test(detail), `${file}: 카드의 정확한 playUrl로 연결해야 합니다.`);
+  assert(/href="\.\/"/.test(detail) && /포트폴리오로 돌아가기/.test(detail));
+  assert(new RegExp(`${testCount}/${testCount}`).test(detail));
+  assert(/STATIC SINGLE-PLAYER EDITION/.test(detail) && /서버나 온라인 기능 없이/.test(detail));
+  images.forEach(image => assert(detail.includes(image) && fs.existsSync(path.join(root, image))));
+  assert(/<img[^>]+alt="[^"]+"/.test(detail) && /loading="lazy"/.test(detail));
+  assert(!/downloadable|multiplayer support/i.test(detail));
+});
 const ttakReleaseRelative = 'games/ttak-club/v1.0.3';
 const ttakReleaseDir = path.join(root, ttakReleaseRelative);
 const ttakReleaseFiles = [
@@ -135,7 +191,7 @@ const realDriveDetail = fs.readFileSync(realDriveDetailPath, 'utf8');
   'assets/projects/realdrive-horizon-map.png'
 ].forEach(text => assert(realDriveDetail.includes(text), `RealDrive 상세 페이지에 ${text} 정보가 필요합니다.`));
 assert(/아직 공개 다운로드를 제공하지 않습니다/.test(realDriveDetail), '개발 중인 게임을 공개된 것처럼 보이면 안 됩니다.');
-assert(/27개 프로젝트/.test(html), '공유 메타 설명의 프로젝트 수를 27개로 동기화해야 합니다.');
+assert(/29개 프로젝트/.test(html), '공유 메타 설명의 프로젝트 수를 29개로 동기화해야 합니다.');
 assert(/realdrive-detail/.test(css), 'RealDrive 상세 페이지 전용 반응형 스타일이 필요합니다.');
 assert(/@media\(max-width:900px\)\{\.rd-hero\{grid-template-columns:minmax\(0,1fr\)/.test(css), '모바일 1열 hero는 큰 이미지 때문에 viewport를 넘지 않아야 합니다.');
 assert(/prefers-reduced-motion/.test(css), '상세 페이지도 모션 감소 접근성을 유지해야 합니다.');

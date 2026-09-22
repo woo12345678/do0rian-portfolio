@@ -89,6 +89,34 @@
       tags: ['Hero Shooter', '52 Heroes', '5v5', 'Three.js', 'Socket.IO']
     },
     {
+      id: 'vault-click',
+      title: 'CLICK! VAULT CREW / 찰칵! 금고단',
+      url: 'vault-click.html',
+      playUrl: 'games/vault-click/v1.0.0/',
+      image: 'assets/projects/vault-click-game.png',
+      kind: 'game',
+      platform: 'BROWSER · STATIC SINGLE · OFFLINE',
+      summary: '90초 동안 회전 다이얼을 맞추고, 성공 직후의 짧은 창에 전리품을 챙길지 위험을 이어갈지 결정하는 리듬 기반 금고 털이 점수 게임.',
+      impact: '90-Second Caper · Bank-or-Risk Loop · Fever Chain · 18/18 Tests PASS',
+      role: '게임 기획 · 규칙/밸런스 · Canvas 2D · authored procedural visuals · Web Audio · QA',
+      collaboration: true,
+      tags: ['Timing Game', 'Risk & Reward', 'Canvas 2D', 'Web Audio']
+    },
+    {
+      id: 'stitchkeeper',
+      title: 'STITCHKEEPER',
+      url: 'stitchkeeper.html',
+      playUrl: 'games/stitchkeeper/v1.0.0/',
+      image: 'assets/projects/stitchkeeper-game.png',
+      kind: 'game',
+      platform: 'BROWSER · STATIC SINGLE · OFFLINE',
+      summary: '찢어진 밤의 균열을 바늘로 따라 꿰매고, 느슨한 실을 노리는 잉크 나방을 골무 파동으로 밀어내는 3막 드로잉 점수 게임.',
+      impact: '3 Nights · Path-Stitching · Moth Pressure · 12/12 Tests PASS',
+      role: '게임 기획 · 물리/경로 규칙 · Canvas 2D · authored procedural visuals · Web Audio · QA',
+      collaboration: true,
+      tags: ['Path Drawing', 'Canvas 2D', 'Procedural Art', 'Score Attack']
+    },
+    {
       id: 'hannun-life-help',
       title: '한눈 생활도움',
       url: 'https://woo12345678.github.io/hannun-life-help/',

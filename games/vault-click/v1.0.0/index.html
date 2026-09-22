@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#182033">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
+  <title>찰칵! 금고단 — CLICK! VAULT CREW</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <section id="title-screen" class="screen active" aria-labelledby="game-title">
+      <div class="poster-copy">
+        <p class="eyebrow">A 90-SECOND MECHANICAL CAPER</p>
+        <h1 id="game-title"><span>찰칵!</span> 금고단</h1>
+        <p class="english-title">CLICK! VAULT CREW</p>
+        <p class="tagline">맞춰라. 욕심내라. 챙겨라.</p>
+        <button id="start-button" class="primary">작전 시작 <small>START</small></button>
+        <div class="rules-slip" aria-label="게임 방법">
+          <b>작전 지침</b><span>금빛 구간에서 찰칵!</span><span>성공 직후 0.7초 안에 B로 챙기기</span><span>경보 3번 전에 점수를 지켜라</span>
+        </div>
+        <p class="best-line">최고 기록 <strong id="title-best">0</strong></p>
+      </div>
+      <div class="hero-vault" aria-hidden="true">
+        <div class="silhouette left"><i></i></div><div class="silhouette right"><i></i></div>
+        <div class="vault-illustration"><div class="vault-spokes"></div><div class="vault-hub">V</div></div>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen" aria-label="게임 진행">
+      <header class="instrument-bar">
+        <div><small>남은 시간</small><strong id="timer">90.0</strong></div>
+        <div class="banked"><small>금고에 챙김</small><strong id="banked">0</strong></div>
+        <div><small>경보</small><span id="alarms" class="lamps" aria-label="경보 0/3">○ ○ ○</span></div>
+      </header>
+      <div class="playfield">
+        <canvas id="vault-canvas" width="900" height="650">금빛 표적과 바늘이 겹칠 때 눌러 금고를 여세요.</canvas>
+        <div id="callout" class="callout" aria-live="polite"></div>
+        <div class="side-readout left-readout"><small>COMBO</small><strong id="combo">0</strong><span id="multiplier">×1.00</span></div>
+        <div class="side-readout right-readout"><small>FEVER</small><span id="fever-pips" class="pips">○ ○ ○</span><small id="vault-count">CHAMBER 0</small></div>
+      </div>
+      <footer class="action-deck">
+        <button id="crack-button" class="crack">찰칵! <small>SPACE / TAP DIAL</small></button>
+        <div class="bag"><small>아직 안 챙긴 가방</small><strong id="bag">0</strong></div>
+        <div class="bank-slot">
+          <div class="decision-track" aria-hidden="true"><i id="decision-meter"></i></div>
+          <button id="bank-button" class="bank" disabled>챙기기 <small>B</small></button>
+        </div>
+      </footer>
+      <div class="utility"><button id="pause-button">일시정지 P</button><button id="mute-button">소리 켬 M</button></div>
+      <div id="pause-curtain" class="pause-curtain" hidden><strong>작전 잠시 멈춤</strong><button id="resume-button">계속하기</button></div>
+    </section>
+
+    <section id="result-screen" class="screen result" aria-labelledby="result-title">
+      <p class="eyebrow">THE CAPER REPORT</p><h2 id="result-title">작전 종료</h2><p id="result-reason" class="result-reason"></p>
+      <div class="score-stamp"><small>BANKED SCORE</small><strong id="final-score">0</strong><span id="new-best"></span></div>
+      <dl><div><dt>최대 콤보</dt><dd id="final-combo">0</dd></div><div><dt>PERFECT</dt><dd id="final-perfects">0</dd></div><div><dt>열린 금고</dt><dd id="final-vaults">0</dd></div><div><dt>최고 기록</dt><dd id="final-best">0</dd></div></dl>
+      <button id="replay-button" class="primary">다시 작전 <small>REPLAY</small></button>
+    </section>
+  </main>
+  <script type="module" src="src/game.js"></script>
+</body>
+</html>
