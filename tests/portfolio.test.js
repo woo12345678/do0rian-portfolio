@@ -32,6 +32,7 @@ const ttakClub = projects.find(p => p.id === 'ttak-club');
 const echoFront = projects.find(p => p.id === 'echo-front');
 const vaultClick = projects.find(p => p.id === 'vault-click');
 const stitchkeeper = projects.find(p => p.id === 'stitchkeeper');
+const stitchkeeperInventorySha256 = '786fb53ee431f6e2273d50bfd480bd19a1c82a5a7eb48db9fb3796abe0306639';
 assert.deepStrictEqual(projects.slice(3, 8).map(p => p.id), ['realdrive-horizon', 'ttak-club', 'echo-front', 'vault-click', 'stitchkeeper'], '네 게임은 RealDrive 바로 다음, 비게임 프로젝트 전에 정확한 순서로 있어야 합니다.');
 [
   [ttakClub, 'games/ttak-club/v1.0.3/', 'assets/projects/ttak-club-home.png', /7 Modes/, /119\/119/],
@@ -52,9 +53,9 @@ assert(/결정론적/.test(ttakClub.summary) && /Canvas 2D/.test(ttakClub.role) 
 assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echoFront.summary) && /Three\.js/.test(echoFront.role));
 
 [
-  [vaultClick, 'vault-click.html', 'games/vault-click/v1.0.0/', 'assets/projects/vault-click-game.png', 18, '9f711a17821fa87a4e9a7ab20624bf3f553ce77b'],
-  [stitchkeeper, 'stitchkeeper.html', 'games/stitchkeeper/v1.0.0/', 'assets/projects/stitchkeeper-game.png', 12, 'ff2062a4726c9050454bc596651035e767e9f79c']
-].forEach(([project, detailUrl, playUrl, image, testCount, sourceSha]) => {
+  [vaultClick, 'vault-click.html', 'games/vault-click/v1.0.0/', 'assets/projects/vault-click-game.png', 18, '9f711a17821fa87a4e9a7ab20624bf3f553ce77b', null, null],
+  [stitchkeeper, 'stitchkeeper.html', 'games/stitchkeeper/v2.0.0/', 'assets/projects/stitchkeeper-game.png', 15, '66fdf6aa3fe42839bfffb8eb94f0085acbf33c1c', '2.0.0', stitchkeeperInventorySha256]
+].forEach(([project, detailUrl, playUrl, image, testCount, sourceSha, version, pinnedInventory]) => {
   assert(project, `${detailUrl}: 프로젝트가 필요합니다.`);
   assert.strictEqual(project.url, detailUrl, `${project.id}: 카드가 상세 페이지를 열어야 합니다.`);
   assert.strictEqual(project.playUrl, playUrl, `${project.id}: 검증된 정적 런타임 URL을 별도 보존해야 합니다.`);
@@ -71,6 +72,7 @@ assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echo
     : ['build-info.json', 'game-rules.js', 'game.js', 'index.html', 'styles.css'];
   assert.deepStrictEqual(listFiles(releaseDir).sort(), expectedFiles, `${project.id}: 공개 파일 allowlist가 정확해야 합니다.`);
   const info = JSON.parse(fs.readFileSync(path.join(releaseDir, 'build-info.json'), 'utf8'));
+  if (version) assert.strictEqual(info.version, version);
   assert.strictEqual(info.sourceSha, sourceSha);
   assert.strictEqual(info.edition, 'static-single');
   assert.strictEqual(info.online, false);
@@ -83,6 +85,9 @@ assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echo
     return `${fileSha}  ${file}\n`;
   }).join('')).digest('hex');
   assert.strictEqual(inventory, info.inventorySha256, `${project.id}: runtime inventory SHA-256가 일치해야 합니다.`);
+  if (pinnedInventory) {
+    assert.strictEqual(inventory, pinnedInventory, `${project.id}: runtime inventory must match the independently pinned verified digest.`);
+  }
   const releaseIndex = fs.readFileSync(path.join(releaseDir, 'index.html'), 'utf8');
   const refs = [...releaseIndex.matchAll(/(?:src|href)=["']([^"']+)["']/g)].map(match => match[1]);
   refs.filter(ref => !ref.startsWith('data:')).forEach(ref => {
@@ -92,7 +97,7 @@ assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echo
 
 [
   [vaultClick, 'vault-click.html', 'vault-title', 18, ['assets/projects/vault-click-game.png', 'assets/projects/vault-click-title.png']],
-  [stitchkeeper, 'stitchkeeper.html', 'stitchkeeper-title', 12, ['assets/projects/stitchkeeper-game.png', 'assets/projects/stitchkeeper-title.png']]
+  [stitchkeeper, 'stitchkeeper.html', 'stitchkeeper-title', 15, ['assets/projects/stitchkeeper-game.png', 'assets/projects/stitchkeeper-title.png']]
 ].forEach(([project, file, titleId, testCount, images]) => {
   const detail = fs.readFileSync(path.join(root, file), 'utf8');
   assert.strictEqual(project.url, file, `${file}: production card inbound link가 필요합니다.`);
@@ -106,6 +111,14 @@ assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echo
   assert(/<img[^>]+alt="[^"]+"/.test(detail) && /loading="lazy"/.test(detail));
   assert(!/downloadable|multiplayer support/i.test(detail));
 });
+const stitchkeeperDetail = fs.readFileSync(path.join(root, 'stitchkeeper.html'), 'utf8');
+['12 NIGHTS', '5 DIFFICULTIES', '24 PATTERNS', '15/15 TESTS PASS', '다정한 밤', '보통', '거친', '지옥', '불가능']
+  .forEach(claim => assert(stitchkeeperDetail.includes(claim), `Stitchkeeper detail needs verified claim: ${claim}`));
+assert(/24[^<]*(?:point-cloud|포인트 클라우드)/i.test(stitchkeeperDetail));
+assert(/seed/i.test(stitchkeeperDetail) && /mirror|미러/i.test(stitchkeeperDetail) && /rotation|회전/i.test(stitchkeeperDetail) && /jitter/i.test(stitchkeeperDetail) && /order|순서/i.test(stitchkeeperDetail));
+assert(/moth/i.test(stitchkeeperDetail) && /speed|속도/i.test(stitchkeeperDetail) && /acceleration|가속/i.test(stitchkeeperDetail) && /reaction|반응/i.test(stitchkeeperDetail));
+assert(/Hell\/Impossible|지옥\/불가능/.test(stitchkeeperDetail) && /intentionally extreme|의도적으로 극단적/i.test(stitchkeeperDetail));
+assert(!/3막|3 Nights|12\/12|v1\.0\.0/i.test(stitchkeeperDetail), 'Stitchkeeper detail must not contain stale v1 claims.');
 const ttakReleaseRelative = 'games/ttak-club/v1.0.3';
 const ttakReleaseDir = path.join(root, ttakReleaseRelative);
 const ttakReleaseFiles = [
