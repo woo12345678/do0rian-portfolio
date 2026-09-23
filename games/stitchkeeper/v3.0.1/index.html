@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#171923">
+  <meta name="description" content="STITCHKEEPER — 밤을 꿰매는 사람. A hand-drawn browser score-attack game.">
+  <title>STITCHKEEPER — 밤을 꿰매는 사람</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="masthead" aria-label="Game title">
+      <p class="eyebrow">AN INTERACTIVE NIGHT-TIME FABLE</p>
+      <h1>STITCHKEEPER</h1>
+      <p class="subtitle">밤을 꿰매는 사람</p>
+    </header>
+
+    <section class="game-wrap" aria-label="STITCHKEEPER game">
+      <canvas id="game" width="1280" height="720" tabindex="0" aria-label="Game canvas. Drag between matching glowing ends to stitch tears. Press Space to repel moths. Press P or Escape to pause.">
+        Your browser needs Canvas support to play STITCHKEEPER.
+      </canvas>
+      <aside class="orientation-notice" aria-label="가로 화면 권장">
+        <span>가로 화면에서 바늘을 잡아주세요</span>
+        <strong>ROTATE TO LANDSCAPE</strong>
+      </aside>
+      <div id="difficulty-panel" class="difficulty-panel" aria-label="난이도 선택">
+        <p class="difficulty-caption">CHOOSE THE TEMPER OF NIGHT · 난이도</p>
+        <div class="difficulty-choices" role="group" aria-label="Difficulty">
+          <button class="difficulty-choice" data-difficulty="gentle" type="button" aria-pressed="false">다정한 밤</button>
+          <button class="difficulty-choice" data-difficulty="normal" type="button" aria-pressed="true">보통 밤</button>
+          <button class="difficulty-choice" data-difficulty="hard" type="button" aria-pressed="false">거친 밤</button>
+          <button class="difficulty-choice" data-difficulty="hell" type="button" aria-pressed="false">지옥</button>
+          <button class="difficulty-choice" data-difficulty="impossible" type="button" aria-pressed="false">불가능</button>
+        </div>
+        <p id="difficulty-description" aria-live="polite">바늘과 나방의 균형 · NORMAL ×1.00</p>
+      </div>
+      <button id="mute" class="margin-control" type="button" aria-label="Mute sound" aria-pressed="false">SOUND · ON</button>
+      <button id="start" class="start-button" type="button">ENTER THE NIGHT</button>
+      <section id="charm-panel" class="charm-panel" role="dialog" aria-modal="true" aria-labelledby="charm-heading" hidden>
+        <h2 id="charm-heading">한 땀을 고르세요 · CHOOSE A CHARM</h2>
+        <div id="charm-choices" class="charm-choices"></div>
+      </section>
+      <div id="announcer" class="sr-only" aria-live="polite"></div>
+    </section>
+
+    <footer>
+      <p>drag to mend · tap or <kbd>space</kbd> to ward · <kbd>p</kbd> to pause</p>
+      <p class="credit">Designed &amp; built as an interactive illustration.</p>
+    </footer>
+  </main>
+  <script src="game-rules.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

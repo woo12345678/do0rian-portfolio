@@ -33,7 +33,7 @@ const ttakClub = projects.find(p => p.id === 'ttak-club');
 const echoFront = projects.find(p => p.id === 'echo-front');
 const vaultClick = projects.find(p => p.id === 'vault-click');
 const stitchkeeper = projects.find(p => p.id === 'stitchkeeper');
-const stitchkeeperInventorySha256 = '827da87af4d67d6f4f4f8a3e2627d88f544cb4d49fef51466842d740589fefc9';
+const stitchkeeperInventorySha256 = '47c8ba506d16065e29cf1b3b247c3bb86d6ad4c02040de121c79c326a49f2860';
 assert.deepStrictEqual(projects.slice(3, 8).map(p => p.id), ['realdrive-horizon', 'ttak-club', 'echo-front', 'vault-click', 'stitchkeeper'], '네 게임은 RealDrive 바로 다음, 비게임 프로젝트 전에 정확한 순서로 있어야 합니다.');
 [
   [ttakClub, 'games/ttak-club/v1.0.3/', 'assets/projects/ttak-club-home.png', /7 Modes/, /119\/119/],
@@ -55,7 +55,7 @@ assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echo
 
 [
   [vaultClick, 'vault-click.html', 'games/vault-click/v1.0.0/', 'assets/projects/vault-click-game.png', 18, '9f711a17821fa87a4e9a7ab20624bf3f553ce77b', null, null],
-  [stitchkeeper, 'stitchkeeper.html', 'games/stitchkeeper/v3.0.0/', 'assets/projects/stitchkeeper-game.png', 16, '227a911315c8e4e22f9c67fcca8a37e33c6c9101', '3.0.0', stitchkeeperInventorySha256]
+  [stitchkeeper, 'stitchkeeper.html', 'games/stitchkeeper/v3.0.1/', 'assets/projects/stitchkeeper-game.png', 17, 'eb0bbc0a0348bd1f30318ef48c361cf5c09b17db', '3.0.1', stitchkeeperInventorySha256]
 ].forEach(([project, detailUrl, playUrl, image, testCount, sourceSha, version, pinnedInventory]) => {
   assert(project, `${detailUrl}: 프로젝트가 필요합니다.`);
   assert.strictEqual(project.url, detailUrl, `${project.id}: 카드가 상세 페이지를 열어야 합니다.`);
@@ -98,7 +98,7 @@ assert(/52명의 오리지널 영웅/.test(echoFront.summary) && /5v5/.test(echo
 
 [
   [vaultClick, 'vault-click.html', 'vault-title', 18, ['assets/projects/vault-click-game.png', 'assets/projects/vault-click-title.png']],
-  [stitchkeeper, 'stitchkeeper.html', 'stitchkeeper-title', 16, ['assets/projects/stitchkeeper-game.png', 'assets/projects/stitchkeeper-draft.png', 'assets/projects/stitchkeeper-title.png']]
+  [stitchkeeper, 'stitchkeeper.html', 'stitchkeeper-title', 17, ['assets/projects/stitchkeeper-game.png', 'assets/projects/stitchkeeper-draft.png', 'assets/projects/stitchkeeper-title.png']]
 ].forEach(([project, file, titleId, testCount, images]) => {
   const detail = fs.readFileSync(path.join(root, file), 'utf8');
   assert.strictEqual(project.url, file, `${file}: production card inbound link가 필요합니다.`);
@@ -118,7 +118,7 @@ const stitchkeeperPublicCopy = `${stitchkeeper.summary}\n${stitchkeeperDetail}`;
   .forEach(phrase => assert(!stitchkeeperPublicCopy.includes(phrase), `Stitchkeeper public copy must not retain awkward phrase: ${phrase}`));
 ['5개 난이도', '4종 특수 솔기', '네 종류 솔기', '바느질 허용 폭', '절단 저항', '온전함', '5단계 난이도', 'ECLIPSE NIGHT · CHARM BUILD ACTIVE']
   .forEach(phrase => assert(stitchkeeperPublicCopy.includes(phrase), `Stitchkeeper public copy needs natural Korean phrasing: ${phrase}`));
-['12 NIGHTS', '9 CHARMS', '4 SEAM TYPES', '16/16 TESTS PASS', '다정한 밤', '보통', '거친', '지옥', '불가능']
+['12 NIGHTS', '9 CHARMS', '4 SEAM TYPES', '17/17 TESTS PASS', '다정한 밤', '보통', '거친', '지옥', '불가능']
   .forEach(claim => assert(stitchkeeperDetail.includes(claim), `Stitchkeeper detail needs verified claim: ${claim}`));
 assert(/(?:nights?\s*)?3\s*[/·,]\s*6\s*[/·,]\s*9|3·6·9/i.test(stitchkeeperDetail), 'Charm drafts must occur after nights 3/6/9.');
 assert(/three|3개|3가지/i.test(stitchkeeperDetail) && /deterministic|결정론/i.test(stitchkeeperDetail) && /non-repeating|중복 없/i.test(stitchkeeperDetail));
@@ -130,18 +130,22 @@ assert(/seed/i.test(stitchkeeperDetail) && /mirror|미러/i.test(stitchkeeperDet
 assert(/moth/i.test(stitchkeeperDetail) && /speed|속도/i.test(stitchkeeperDetail) && /acceleration|가속/i.test(stitchkeeperDetail) && /score|점수/i.test(stitchkeeperDetail));
 assert(/Hell\/Impossible|지옥\/불가능/.test(stitchkeeperDetail) && /intentionally extreme|의도적으로 극단적/i.test(stitchkeeperDetail));
 assert(!/3막|3 Nights|12\/12|v1\.0\.0/i.test(stitchkeeperDetail), 'Stitchkeeper detail must not contain stale v1 claims.');
-assert(!/v2\.0\.0|15\/15|5 DIFFICULTIES|24 PATTERNS/i.test(stitchkeeperDetail), 'Active detail must not retain v2-only release labels or metrics.');
-assert(!/v2\.0\.0|15\/15/.test(JSON.stringify(stitchkeeper)), 'Active card must not retain the v2 release.');
-assert.strictEqual(stitchkeeper.impact, '12 Nights · 9 Charms · 4 Seam Types · 16/16 Tests PASS');
+assert(!/v(?:2\.0\.0|3\.0\.0)|15\/15|16\/16|5 DIFFICULTIES|24 PATTERNS/i.test(stitchkeeperDetail), 'Active detail must not retain stale release labels or metrics.');
+assert(!/v(?:2\.0\.0|3\.0\.0)|(?:15\/15|16\/16)/.test(JSON.stringify(stitchkeeper)), 'Active card must not retain a stale release.');
+assert.strictEqual(stitchkeeper.impact, '12 Nights · 9 Charms · 4 Seam Types · 17/17 Tests PASS');
+assert(fs.existsSync(path.join(root, 'games/stitchkeeper/v3.0.0/build-info.json')), 'The prior v3.0.0 artifact must remain preserved.');
+assert(/<title>[^<]*3\.0\.1/.test(stitchkeeperDetail) && /STATIC WEB GAME · v3\.0\.1/.test(stitchkeeperDetail) && /STITCHKEEPER v3\.0\.1 · KNOTCRAFT/.test(stitchkeeperDetail));
+assert(/constrained-viewport accessibility patch/i.test(stitchkeeperDetail));
+assert(/charm HUD/i.test(stitchkeeperDetail) && /special seam labels/i.test(stitchkeeperDetail) && /(?:>=|&gt;=)10 CSS px/.test(stitchkeeperDetail) && /1264×625/.test(stitchkeeperDetail));
 ['Run Builds', 'Risk & Reward', 'Randomized Maps'].forEach(tag => assert(stitchkeeper.tags.includes(tag), `Stitchkeeper needs tag ${tag}`));
 ['12', '5개 난이도', '3·6·9', '9', '4종 특수 솔기', 'Eclipse', '24'].forEach(claim => assert(stitchkeeper.summary.includes(claim), `Stitchkeeper summary needs ${claim}`));
 
-const stitchkeeperReleaseDir = path.join(root, 'games/stitchkeeper/v3.0.0');
+const stitchkeeperReleaseDir = path.join(root, 'games/stitchkeeper/v3.0.1');
 const stitchkeeperRuntimeFiles = ['game-rules.js', 'game.js', 'index.html', 'styles.css'];
 const stitchkeeperSourceRepo = 'C:/Users/UOU/portfolio-game-stitchkeeper';
 stitchkeeperRuntimeFiles.forEach(file => {
   const deployed = fs.readFileSync(path.join(stitchkeeperReleaseDir, file), 'utf8').replace(/\r/g, '');
-  const reviewedBlob = execFileSync('git', ['-C', stitchkeeperSourceRepo, 'show', `227a911315c8e4e22f9c67fcca8a37e33c6c9101:${file}`], { encoding: 'utf8' }).replace(/\r/g, '');
+  const reviewedBlob = execFileSync('git', ['-C', stitchkeeperSourceRepo, 'show', `eb0bbc0a0348bd1f30318ef48c361cf5c09b17db:${file}`], { encoding: 'utf8' }).replace(/\r/g, '');
   assert.strictEqual(deployed, reviewedBlob, `Stitchkeeper ${file} must exactly match its reviewed Git blob.`);
 });
 function pngDimensions(file) {
@@ -150,10 +154,13 @@ function pngDimensions(file) {
   return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
 }
 [
-  ['assets/projects/stitchkeeper-game.png', [1424, 905]],
-  ['assets/projects/stitchkeeper-title.png', [1424, 905]],
-  ['assets/projects/stitchkeeper-draft.png', [1424, 905]]
-].forEach(([file, dimensions]) => assert.deepStrictEqual(pngDimensions(file), dimensions));
+  ['assets/projects/stitchkeeper-game.png', [1424, 905], 'f06677b97c46714081159a622d8894a293b43b97a4d85cc0351bcaa4f830b723'],
+  ['assets/projects/stitchkeeper-title.png', [1424, 905], '70b55eb6c3d8e5bd7d4d9efccc400004ddaed64ca8a3488860aeae76991959a2'],
+  ['assets/projects/stitchkeeper-draft.png', [1424, 905], 'ba11ca984f64998d241a06a82d523362a15a2c1731ac030f823467402e2ceb32']
+].forEach(([file, dimensions, sha256]) => {
+  assert.deepStrictEqual(pngDimensions(file), dimensions);
+  assert.strictEqual(crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex'), sha256, `${file} must match the refreshed verified smoke artifact crop.`);
+});
 ['stitchkeeper-game.png', 'stitchkeeper-title.png', 'stitchkeeper-draft.png'].forEach(file => {
   const tag = stitchkeeperDetail.match(new RegExp(`<img[^>]+src="assets/projects/${file}"[^>]*>`));
   assert(tag && /alt="[^"]+"/.test(tag[0]), `${file} needs accurate nonempty alt text.`);
