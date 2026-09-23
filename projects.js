@@ -106,15 +106,15 @@
       id: 'stitchkeeper',
       title: 'STITCHKEEPER',
       url: 'stitchkeeper.html',
-      playUrl: 'games/stitchkeeper/v2.0.0/',
+      playUrl: 'games/stitchkeeper/v3.0.0/',
       image: 'assets/projects/stitchkeeper-game.png',
       kind: 'game',
       platform: 'BROWSER · STATIC SINGLE · OFFLINE',
-      summary: '12밤 캠페인에서 다섯 난이도를 선택해 24개의 물질적으로 구별되는 저작 랜덤 패턴 청사진과 시드 변형을 꿰매고, 느슨한 실을 노리는 잉크 나방의 압박을 견디는 드로잉 점수 게임.',
-      impact: '12 Nights · 5 Difficulties · 24 Pattern Blueprints · 15/15 Tests PASS',
+      summary: '12밤·5개 난이도 캠페인에서 3·6·9밤 후 9개 런 빌드 부적 중 3개를 결정론적으로 드래프트하고, 4종 특수 솔기와 Eclipse 압박을 24개 랜덤 기하 안전 패턴 청사진 위에서 엮어 내는 드로잉 점수 게임.',
+      impact: '12 Nights · 9 Charms · 4 Seam Types · 16/16 Tests PASS',
       role: '게임 기획 · 물리/경로 규칙 · Canvas 2D · authored procedural visuals · Web Audio · QA',
       collaboration: true,
-      tags: ['Path Drawing', 'Canvas 2D', 'Procedural Art', 'Randomized Maps', 'Difficulty Modes', 'Score Attack']
+      tags: ['Path Drawing', 'Canvas 2D', 'Procedural Art', 'Run Builds', 'Risk & Reward', 'Randomized Maps', 'Difficulty Modes', 'Score Attack']
     },
     {
       id: 'hannun-life-help',
