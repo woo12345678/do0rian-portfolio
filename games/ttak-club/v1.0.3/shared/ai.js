@@ -48,6 +48,14 @@
     }
     return best;
   }
+  function poolPlan(g,legal){
+    const cue=legal.find(object=>object.kind==='cue');if(!cue)return null;
+    const group=g.poolGroups?.[g.turn],belongs=number=>group==='solids'?number>=1&&number<=7:group==='stripes'?number>=9&&number<=15:number!==8;
+    let targets=g.objects.filter(object=>object.active&&object.kind==='pool'&&belongs(object.number));
+    if(group&&!targets.length)targets=g.objects.filter(object=>object.active&&object.kind==='pool'&&object.number===8);
+    targets.sort((a,b)=>(segmentBlocked(g,cue,a)?10000:0)+distance(cue,a)-(segmentBlocked(g,cue,b)?10000:0)-distance(cue,b));
+    return targets.length?{disc:cue,target:targets[0]}:null;
+  }
   function lineShot(g,disc,profile,random){
     const safety=profile.lineMin+profile.lineSpread*random();
     const target=R.lineTarget(g.board.targetLine,disc,safety);
@@ -118,6 +126,10 @@
     if(g.mode==='football'){
       const plan=footballPlan(g,legal);
       if(plan)return shotToward(plan.disc,plan.target,profile.footballPower,profile,random);
+    }
+    if(g.mode==='pool'){
+      const plan=poolPlan(g,legal);
+      if(plan)return shotToward(plan.disc,plan.target,profile.impactPower,profile,random);
     }
     if(g.mode==='line')return lineShot(g,legal[0],profile,random);
     if(g.mode==='golf')return golfShot(g,legal[0],profile,random);

@@ -14,7 +14,8 @@
   const FIELD_GEOMETRY=deepFreeze({
     classic:{grid:{lines:19,left:294,top:54,spacing:34},stars:[3,9,15].flatMap(row=>[3,9,15].map(column=>({column,row}))),frame:{x:270,y:30,w:660,h:660}},
     football:{orientation:'vertical',goals:{x1:500,x2:700},touchline:{x:310,y:20,w:580,h:680},halfway:{y:360},center:{x:600,y:360,radius:72},penaltyBoxes:[{x:430,y:20,w:340,h:125},{x:430,y:575,w:340,h:125}]},
-    footballLarge:{orientation:'vertical',goals:{x1:450,x2:750},touchline:{x:150,y:20,w:900,h:680},halfway:{y:360},center:{x:600,y:360,radius:88},penaltyBoxes:[{x:350,y:20,w:500,h:145},{x:350,y:555,w:500,h:145}]}
+    footballLarge:{orientation:'vertical',goals:{x1:450,x2:750},touchline:{x:150,y:20,w:900,h:680},halfway:{y:360},center:{x:600,y:360,radius:88},penaltyBoxes:[{x:350,y:20,w:500,h:145},{x:350,y:555,w:500,h:145}]},
+    pool:{playfield:{x:150,y:40,w:900,h:640},pockets:[{x:150,y:40,r:35},{x:600,y:40,r:32},{x:1050,y:40,r:35},{x:150,y:680,r:35},{x:600,y:680,r:32},{x:1050,y:680,r:35}]}
   });
   const LINE_LAYOUTS=deepFreeze([
     {id:'h-close',kind:'horizontal',a:{x:70,y:410},b:{x:1130,y:410},spawns:[{x:520,y:630},{x:680,y:630}]},
@@ -90,9 +91,15 @@
     }
     return out;
   }
+  function poolPieces(){
+    const objects=[P.body({id:'cue',kind:'cue',team:0,x:600,y:570,radius:18,mass:.92,friction:.55})],radius=18,rowGap=radius*Math.sqrt(3)+1,columnGap=radius*2+2,rack=[1,9,2,3,8,10,11,4,12,5,6,13,7,14,15];
+    let index=0;
+    for(let row=0;row<5;row++)for(let column=0;column<=row;column++){const number=rack[index++];objects.push(P.body({id:`p${number}`,kind:'pool',number,x:600+(column-row/2)*columnGap,y:245+row*rowGap,radius,mass:1,friction:.55}));}
+    return objects;
+  }
   function trickPositions(center,angle,bend=0){
     const spacing=76,dx=Math.cos(angle),dy=Math.sin(angle),px=-dy,py=dx;
-    return Array.from({length:5},(_,index)=>{const along=(index-2)*spacing,curve=(index===2?0:Math.abs(index-2)*bend);return{x:center.x+dx*along+px*curve,y:center.y+dy*along+py*curve};});
+    return Array.from({length:3},(_,index)=>{const along=(index-1)*spacing,curve=(index===1?0:Math.abs(index-1)*bend);return{x:center.x+dx*along+px*curve,y:center.y+dy*along+py*curve};});
   }
   function trickTargetPositions(random=Math.random,rotation=0){return trickPositions({x:600+(random()-.5)*320,y:360+(random()-.5)*210},random()*Math.PI*2+rotation,(random()-.5)*22);}
   function placeTrickTargets(g,increment=false){
@@ -101,17 +108,18 @@
     if(!positions)for(let y=100;y<=620&&!positions;y+=65)for(let x=210;x<=990&&!positions;x+=65)for(const angle of [0,Math.PI/2,Math.PI/4,-Math.PI/4]){const candidate=trickPositions({x,y},angle);if(clear(candidate)){positions=candidate;break;}}
     if(!positions)throw new Error('Unable to place trick-shot targets without overlap');
     const targets=g.objects.filter(object=>object.kind==='target');
-    for(let index=0;index<5;index++){let target=targets[index];if(!target){target=P.body({id:`t${index+1}`,kind:'target',number:index+1,radius:28,mass:.78,friction:.55});g.objects.push(target);}Object.assign(target,positions[index],{vx:0,vy:0,active:true});}
+    for(let index=0;index<3;index++){let target=targets[index];if(!target){target=P.body({id:`t${index+1}`,kind:'target',number:index+1,radius:28,mass:.78,friction:.55});g.objects.push(target);}Object.assign(target,positions[index],{vx:0,vy:0,active:true});}
     if(increment)g.targetResetCount++;
   }
   function createGame(opts={}) {
-    serial=0; const mode=opts.mode||'classic', requestedPlayers=Math.max(1,Math.min(5,opts.players||2)), players=mode==='football'?2:requestedPlayers, s=opts.settings||{};
+    serial=0; const mode=opts.mode||'classic', requestedPlayers=Math.max(1,Math.min(5,opts.players||2)), players=mode==='football'||mode==='pool'?2:requestedPlayers, s=opts.settings||{};
     const settings={...s};
     if(mode==='classic')settings.formation=Object.hasOwn(FORMATIONS,s.formation)?s.formation:'standard';
     const firstTurn=s.firstPlayer==='ai'?Math.min(1,players-1):s.firstPlayer==='random'?Math.min(players-1,Math.floor(Math.max(0,Math.min(.999999,Number((typeof opts.rng==='function'?opts.rng:Math.random)())||0))*players)):0;
     const g={mode,players,settings,phase:'aiming',turn:firstTurn,round:1,shot:0,winner:null,scores:Array(players).fill(0),objects:[],board:{width:W,height:H,walls:false,orientation:'vertical'},events:[]};
     if(mode==='classic'){g.board.geometry=FIELD_GEOMETRY.classic;g.board.playfield=FIELD_GEOMETRY.classic.frame;g.board.surface='baduk';g.objects=classicPieces(Math.max(1,Math.min(20,s.discs||5)),settings.formation,players);}
     if(mode==='football'){const discs=Number(s.discs)===5?5:3,geometry=discs===5?FIELD_GEOMETRY.footballLarge:FIELD_GEOMETRY.football;settings.discs=discs;g.board.walls=true;g.board.geometry=geometry;g.board.playfield=geometry.touchline;g.board.goals={...geometry.goals};g.board.surface='grass';g.objects=verticalRows(players,discs,23,geometry);g.objects.push(P.body({id:'ball',kind:'ball',x:600,y:360,radius:20,mass:.65}));}
+    if(mode==='pool'){const geometry=FIELD_GEOMETRY.pool;g.board.walls=true;g.board.surface='pool';g.board.geometry=geometry;g.board.playfield=geometry.playfield;g.board.pockets=geometry.pockets;g.board.friction=.55;g.board.restitution=.9;g.poolGroups=[null,null];g.objects=poolPieces();}
     if(mode==='line'){const layout=chooseLineLayout(opts.rng,s.lineLayout),safeSign=Math.sign(lineCross(layout,layout.spawns[0]))||1,spawns=lineSpawnPoints(layout,players);g.board={width:W,height:H,walls:true,orientation:'vertical',targetLine:{id:layout.id,kind:layout.kind,a:{...layout.a},b:{...layout.b},safeSign}};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=spawns.map((spawn,t)=>disc(t,spawn.x,spawn.y));}
     if(mode==='golf'){g.board.walls=true;g.hole=0; setupHole(g);}
     if(mode==='coop'){g.players=players;g.turnBudget=12;g.wave=1;g.counterInterval=({easy:5,normal:4,hard:3})[s.difficulty]||4;g.turnsUntilCounter=g.counterInterval;spawnCoop(g);}
@@ -123,6 +131,7 @@
   function spawnCoop(g){g.board={width:W,height:H,walls:false};g.turnsUntilCounter=g.counterInterval;g.objects=Array.from({length:g.players},(_,t)=>disc(t,160,250+t*70));for(let i=0;i<2+g.wave;i++)g.objects.push(P.body({id:`g${g.wave}-${i}`,kind:'goblin',team:-1,x:720+i*75,y:230+(i%3)*120,radius:i===0?34:27,mass:i===0?2.5:1,heavy:i===0}));}
   function eligibleObjects(g, player=g.turn){
     if(g.phase!=='aiming')return[];
+    if(g.mode==='pool')return g.objects.filter(o=>o.active&&o.kind==='cue');
     if(g.mode==='coop')return g.objects.filter(o=>o.active&&o.kind==='disc'&&o.team===player);
     return g.objects.filter(o=>o.active&&o.kind==='disc'&&o.team===player);
   }
@@ -135,7 +144,32 @@
     g.phase='finished';g.winner=null;return false;
   }
   function ensureActiveTurn(g){if(activeTeams(g).has(g.turn)){g.phase='aiming';return true;}return advance(g);}
+  const poolGroup=number=>number>=1&&number<=7?'solids':number>=9&&number<=15?'stripes':null;
+  const oppositePoolGroup=group=>group==='solids'?'stripes':'solids';
+  function poolCount(g,group,active=true){return g.objects.filter(object=>object.kind==='pool'&&poolGroup(object.number)===group&&object.active===active).length;}
+  function respotCue(g){
+    const cue=g.objects.find(object=>object.kind==='cue'),spots=[{x:600,y:570},{x:500,y:570},{x:700,y:570},{x:600,y:500}];
+    const spot=spots.find(point=>g.objects.filter(object=>object.active&&object!==cue).every(object=>Math.hypot(point.x-object.x,point.y-object.y)>=cue.radius+object.radius+3))||spots[0];
+    Object.assign(cue,spot,{vx:0,vy:0,active:true,team:g.turn});
+  }
+  function nextPoolTurn(g){const previous=g.turn;g.turn=1-g.turn;if(g.turn<=previous)g.round++;const cue=g.objects.find(object=>object.kind==='cue');if(cue)cue.team=g.turn;g.phase='aiming';}
+  function resolvePool(g,events){
+    const player=g.turn,opponent=1-player,pockets=events.filter(event=>event.type==='pocket'),scratch=pockets.some(event=>event.kind==='cue'||event.id==='cue'),firstHit=events.find(event=>event.type==='cue-hit')?.number??null;
+    for(const event of pockets){const object=g.objects.find(candidate=>candidate.id===event.id);if(object){object.active=false;object.vx=object.vy=0;}}
+    const group=g.poolGroups[player],pocketedNumbers=pockets.map(event=>event.number).filter(Number.isFinite),pocketedGroups=pocketedNumbers.map(poolGroup).filter(Boolean),hadOwnAtStart=group?poolCount(g,group,true)+pocketedNumbers.filter(number=>poolGroup(number)===group).length>0:false;
+    const legalFirst=firstHit!=null&&(group?(hadOwnAtStart?poolGroup(firstHit)===group:firstHit===8):firstHit!==8);
+    const eightPocketed=pocketedNumbers.includes(8);
+    if(eightPocketed){const legalEight=!!group&&!hadOwnAtStart&&firstHit===8&&!scratch;g.winner=legalEight?player:opponent;g.phase='finished';g.poolFoul=legalEight?null:scratch?'scratch-eight':'early-eight';return;}
+    let foul=null;if(scratch)foul='scratch';else if(firstHit==null)foul='no-contact';else if(!legalFirst)foul='wrong-first-hit';
+    if(!foul&&!group&&pocketedGroups.length){const assigned=pocketedGroups[0];g.poolGroups[player]=assigned;g.poolGroups[opponent]=oppositePoolGroup(assigned);}
+    for(let team=0;team<2;team++){const assigned=g.poolGroups[team];g.scores[team]=assigned?7-poolCount(g,assigned,true):0;}
+    const assigned=g.poolGroups[player],ownPocket=!!assigned&&pocketedNumbers.some(number=>poolGroup(number)===assigned);
+    g.poolFoul=foul;
+    if(foul||!ownPocket)nextPoolTurn(g);else{const cue=g.objects.find(object=>object.kind==='cue');if(cue)cue.team=g.turn;g.phase='aiming';}
+    if(scratch)respotCue(g);
+  }
   function resolve(g,events=[]){events=P.accumulateEvents([],events);g.phase='resolution';g.events=events;
+    if(g.mode==='pool'){resolvePool(g,events);return;}
     if(g.mode==='coop'&&g.counterActive){g.counterActive=false;g.turnsUntilCounter=g.counterInterval;if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}ensureActiveTurn(g);return;}
     if(g.mode==='classic'){const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if((g.players===1&&alive.size===0)||(g.players>1&&alive.size<=1)){g.phase='finished';g.winner=g.players>1?([...alive][0]??null):null;return;}}
     if(g.mode==='football'){for(const e of events.filter(e=>e.type==='goal')){const scorer=e.side==='top'?0:1;g.scores[scorer]++;const ball=g.objects.find(o=>o.kind==='ball');Object.assign(ball,{x:600,y:360,vx:0,vy:0,active:true});if(g.scores[scorer]>=Math.max(1,g.settings.targetScore||3)){g.winner=scorer;g.phase='finished';return;}}}
@@ -143,7 +177,7 @@
     if(g.mode==='golf'){const o=g.objects.find(o=>o.kind==='disc'&&o.team===g.turn);const sunk=events.some(e=>e.type==='cup'&&e.team===g.turn)||(!o?.active||Math.hypot(o.x-g.board.cup.x,o.y-g.board.cup.y)<g.board.cup.r);if(sunk&&o){o.active=false;o.vx=o.vy=0;}const active=g.objects.filter(d=>d.kind==='disc'&&d.active);if(sunk&&!active.length){g.hole++;if(g.hole>=HOLES.length){const low=Math.min(...g.scores),leaders=g.scores.map((score,i)=>score===low?i:null).filter(i=>i!==null);g.phase='finished';g.winner=leaders.length===1?leaders[0]:null;return;}g.turn=0;setupHole(g);g.phase='aiming';return;}for(let i=1;i<=g.players;i++){const next=(g.turn+i)%g.players;if(active.some(d=>d.team===next)){if(next<=g.turn)g.round++;g.turn=next;g.phase='aiming';return;}}g.phase='finished';return;}
     if(g.mode==='coop'){if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);advance(g);return;}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}if(!advance(g))return;g.turnsUntilCounter--;if(g.turnsUntilCounter<=0)g.phase='counter';return;}
     if(g.mode==='royal'){g.board.inset=35+Math.max(0,g.round-1)*28;for(const o of g.objects)if(o.active&&(o.x-o.radius<g.board.inset||o.x+o.radius>W-g.board.inset||o.y-o.radius<g.board.inset||o.y+o.radius>H-g.board.inset))o.active=false;const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if((g.players===1&&alive.size===0)||(g.players>1&&alive.size<=1)){g.phase='finished';g.winner=g.players>1?([...alive][0]??null):null;return;}}
-    if(g.mode==='chain'){const sequence=events.filter(event=>event.type==='target').map(event=>event.number);let prefix=0;for(const number of sequence){if(number===prefix+1)prefix++;else break;}const exact=sequence.length===5&&prefix===5;g.lastSequence=sequence;g.scores[g.turn]=Math.max(g.scores[g.turn],exact?5:Math.min(prefix,4));if(exact){g.winner=g.turn;g.phase='finished';return;}g.shotsSinceReset++;if(g.shotsSinceReset>=g.resetEvery){g.shotsSinceReset=0;placeTrickTargets(g,true);}}
+    if(g.mode==='chain'){const sequence=events.filter(event=>event.type==='target').map(event=>event.number);let prefix=0;for(const number of sequence){if(number===prefix+1)prefix++;else break;}const exact=sequence.length===3&&prefix===3;g.lastSequence=sequence;g.scores[g.turn]=Math.max(g.scores[g.turn],exact?3:Math.min(prefix,2));if(exact){g.winner=g.turn;g.phase='finished';return;}g.shotsSinceReset++;if(g.shotsSinceReset>=g.resetEvery){g.shotsSinceReset=0;placeTrickTargets(g,true);}}
     advance(g);
   }
   function adjudicate(g){
@@ -153,5 +187,5 @@
     const outcome=cooperative?(g.winner==null?'defeat':'victory'):solo?(g.winner==null?'defeat':'victory'):g.winner==null?'draw':'competitive-win';
     return {mode:g.mode,outcome,winner:g.winner,defeated:g.winner==null?[]:Array.from({length:g.players},(_,i)=>i).filter(i=>i!==g.winner)};
   }
-  return {MODES:['classic','football','line','golf','coop','royal','chain'],FORMATIONS,FIELD_GEOMETRY,LINE_LAYOUTS,lineMeasure,lineTarget,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
+  return {MODES:['classic','football','line','golf','coop','royal','chain','pool'],FORMATIONS,FIELD_GEOMETRY,LINE_LAYOUTS,lineMeasure,lineTarget,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
 });

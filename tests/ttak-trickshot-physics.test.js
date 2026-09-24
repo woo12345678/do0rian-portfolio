@@ -15,7 +15,7 @@ for (let step = 0; step < 3600; step++) {
 }
 const sequence = events.filter(event => event.type === 'target').map(event => event.number);
 R.resolve(game, events);
-assert.deepEqual(sequence.slice(0, 5), [1, 2, 3, 2, 4]);
-assert.notEqual(game.phase, 'finished', 'a physical back-collision must invalidate strict 1→5 order');
-assert.deepEqual(game.lastSequence.slice(0, 5), [1, 2, 3, 2, 4]);
+assert.deepEqual(sequence.slice(0, 5), [1, 2, 3, 2, 1]);
+assert.notEqual(game.phase, 'finished', 'a physical back-collision must invalidate strict 1→3 order');
+assert.deepEqual(game.lastSequence.slice(0, 5), [1, 2, 3, 2, 1]);
 console.log(JSON.stringify({ok: true, sequence, winner: game.winner}));

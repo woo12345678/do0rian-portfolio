@@ -3,8 +3,12 @@ const R = require('../games/ttak-club/v1.0.3/shared/rules');
 
 for (const mode of R.MODES) {
   const game = R.createGame({mode, players: 5, settings: {discs: 3, lineLayout: 'h-far'}, rng: () => 0.25});
-  const expected = mode === 'football' ? 2 : 5;
+  const expected = ['football', 'pool'].includes(mode) ? 2 : 5;
   assert.equal(game.players, expected, `${mode} player count`);
+  if (mode === 'pool') {
+    assert.equal(game.objects.filter(object => object.kind === 'cue').length, 1, 'pool has one shared cue ball');
+    continue;
+  }
   const teams = new Set(game.objects.filter(object => object.kind === 'disc').map(object => object.team));
   assert.equal(teams.size, expected, `${mode} active teams`);
   for (const object of game.objects.filter(object => object.kind === 'disc')) {

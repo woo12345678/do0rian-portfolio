@@ -27,6 +27,8 @@
       a.vx -= impulse * nx / a.mass; a.vy -= impulse * ny / a.mass;
       b.vx += impulse * nx / b.mass; b.vy += impulse * ny / b.mass;
       events.push({ type: b.kind === 'target' ? 'target' : a.kind === 'target' ? 'target' : 'impact', id: b.kind === 'target' ? b.id : a.kind === 'target' ? a.id : undefined, number: b.number || a.number, team: a.team ?? b.team, x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, strength: Math.abs(rel) });
+      const cue=a.kind==='cue'?a:b.kind==='cue'?b:null,object=a.kind==='pool'?a:b.kind==='pool'?b:null;
+      if(cue&&object)events.push({type:'cue-hit',id:object.id,number:object.number});
     }
   }
   function step(objects, dt, board) {
@@ -36,6 +38,8 @@
     const emit = event => accumulateEvents(events,[event]);
     const constrain = o => {
       if (!o.active) return;
+      const pocket=board.pockets&&(o.kind==='cue'||o.kind==='pool')&&board.pockets.find(hole=>Math.hypot(o.x-hole.x,o.y-hole.y)<hole.r);
+      if(pocket){o.active=false;o.vx=o.vy=0;emit({type:'pocket',id:o.id,number:o.number,team:o.team,kind:o.kind});return;}
       if (walls) {
         if (open.left ? o.x + o.radius <= left : o.x - o.radius < left) { if(open.left){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;} o.x = left + o.radius; o.vx = Math.abs(o.vx) * restitution; }
         if (open.right ? o.x - o.radius >= right : o.x + o.radius > right) { if(open.right){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;} o.x = right - o.radius; o.vx = -Math.abs(o.vx) * restitution; }

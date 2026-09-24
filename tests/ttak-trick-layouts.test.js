@@ -5,7 +5,7 @@ for(let seed=1;seed<=200;seed++){
   const game=R.createGame({mode:'chain',players:5,rng:rng(seed)});
   const targets=game.objects.filter(object=>object.kind==='target');
   const discs=game.objects.filter(object=>object.kind==='disc');
-  assert.equal(targets.length,5);
+  assert.equal(targets.length,3);
   for(const target of targets){
     assert.ok(target.x-target.radius>=0&&target.x+target.radius<=1200,`seed ${seed}: target x bounds`);
     assert.ok(target.y-target.radius>=0&&target.y+target.radius<=720,`seed ${seed}: target y bounds`);
