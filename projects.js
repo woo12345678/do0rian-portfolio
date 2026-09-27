@@ -117,6 +117,20 @@
       tags: ['Path Drawing', 'Canvas 2D', 'Procedural Art', 'Run Builds', 'Risk & Reward', 'Randomized Maps', 'Difficulty Modes', 'Score Attack']
     },
     {
+      id: 'gulp-goal',
+      title: 'GULP! GOAL! MAYHEM / 꿀꺽! 골! 대소동',
+      url: 'gulp-goal.html',
+      playUrl: 'games/gulp-goal/v1.0.0/',
+      image: 'assets/projects/gulp-goal-volley.png',
+      kind: 'game',
+      platform: 'BROWSER · STATIC SINGLE · OFFLINE',
+      summary: '원포인터 조향으로 더 작은 물체만 크기 게이트에 맞춰 삼켜 포털·콤보·충전을 키우고, 캡슐과 선택 게이트로 3종 크루를 확장한다. 관중·크기·콤보·게이트가 화면의 공은 제한하면서 논리상 거대한 발리 포화를 키우며, 3개 구역과 움직이는 최종 골키퍼를 지나 가득 찼을 때 수동으로 5초 오버드라이브를 터뜨린다.',
+      impact: '3 Districts · 3 Crew Types · 999K Logical Volley Cap · 28/28 Tests PASS',
+      role: '오리지널 게임 기획 · 아트 디렉션 · Canvas 2D authored procedural visuals · Web Audio · 결정론 시스템 · QA',
+      collaboration: true,
+      tags: ['Hypercasual Mashup', 'Size-Gated Growth', 'Crowd Volley', 'Canvas 2D', 'Web Audio', 'Deterministic']
+    },
+    {
       id: 'hannun-life-help',
       title: '한눈 생활도움',
       url: 'https://woo12345678.github.io/hannun-life-help/',

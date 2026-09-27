@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f3e8ca">
+  <title>GULP! GOAL! MAYHEM — 꿀꺽! 골! 대소동</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="game-shell">
+    <p id="game-description" class="sr-only">마우스, 터치, 왼쪽 오른쪽 화살표 또는 A D 키로 구멍을 움직입니다. 구멍보다 작은 음식은 삼키고 빨간 줄무늬 장애물은 크기와 관계없이 피하세요. 좌우 게이트를 골라 크루, 발리 또는 집중력을 강화하세요. 충전이 100퍼센트일 때 스페이스 키로 오버드라이브를 켜면 5초 동안 음식과 캡슐을 끌어당기고 다음 발리가 강화됩니다. 마지막 구역에서는 움직이는 골키퍼 반대쪽을 조준하세요.</p>
+    <canvas id="game" tabindex="0" role="img" aria-label="꿀꺽! 골! 대소동 게임 화면" aria-describedby="game-description"></canvas>
+    <header class="hud">
+      <div class="brand-mini">GULP! <i>GOAL!</i></div>
+      <div class="stat"><span>점수 SCORE</span><strong id="score">000000</strong></div>
+      <div class="stat"><span>크루 CREW</span><strong id="crew">04</strong></div>
+      <div class="roster" aria-label="크루 병과"><span class="r-launch">L 발사</span><span class="r-twin">2 쌍포</span><span class="r-break">G 파괴</span></div>
+      <button id="mute" class="ink-button icon" aria-label="소리 끄기" aria-pressed="false">소리 ON</button>
+    </header>
+    <section id="title" class="panel title-panel">
+      <div class="burst">한 손가락<br>대소동!</div>
+      <h1><span>GULP!</span><span>GOAL!</span><em>MAYHEM</em></h1>
+      <p class="ko-title">꿀꺽! 골! 대소동</p>
+      <ol class="beats"><li><b>1</b> 작은 건 꿀꺽</li><li><b>2</b> 크루는 와글와글</li><li><b>3</b> 골문엔 우르르!</li></ol>
+      <button id="start" class="start-button">대소동 시작! <small>START RUN</small></button>
+      <p class="tiny">마우스·터치·← → / A D &nbsp;·&nbsp; SPACE 오버드라이브</p>
+    </section>
+    <section id="overlay" class="panel overlay" hidden>
+      <p id="overlay-kicker">1구역 완료</p>
+      <h2 id="overlay-title">꿀꺽 도장!</h2>
+      <p id="overlay-detail"></p>
+      <button id="replay" class="start-button" hidden>다시 대소동! <small>REPLAY</small></button>
+    </section>
+    <div class="bottom-ui">
+      <div class="combo"><span>COMBO</span><strong id="combo">×0</strong></div>
+      <button id="overdrive" disabled><span>OVERDRIVE</span><b id="overdrive-label">0%</b></button>
+      <div class="wave"><span>구역 DISTRICT</span><strong id="wave">1 / 3</strong></div>
+    </div>
+    <div id="pause" class="pause-card" role="status" aria-live="assertive" hidden><b>잠깐!</b><span>PAUSED · P / ESC로 계속</span></div>
+    <p id="announce" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+  </main>
+  <script src="game-rules.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
