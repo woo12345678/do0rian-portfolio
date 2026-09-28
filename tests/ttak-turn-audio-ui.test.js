@@ -1,0 +1,25 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const base = 'games/ttak-club/v1.0.3/';
+const index = fs.readFileSync(base + 'index.html', 'utf8');
+const app = fs.readFileSync(base + 'js/app.js', 'utf8');
+const css = fs.readFileSync(base + 'css/style.css', 'utf8');
+const sw = fs.readFileSync(base + 'sw.js', 'utf8');
+
+assert.ok(index.indexOf('./shared/feedback.js') < index.indexOf('./js/app.js'), 'feedback loads before app');
+assert.match(index, /id="turnBanner"[^>]*aria-live="assertive"/);
+assert.match(index, /id="turnFrom"/);
+assert.match(index, /id="turnTo"/);
+assert.match(app, /TtakFeedback/);
+assert.match(app, /F\.turnNotice\(/);
+assert.match(app, /F\.audioCue\(game\.mode,e\)/);
+assert.match(app, /F\.audioEventKey\(game\.mode,e\)/);
+assert.match(app, /playedSoundEvents/);
+assert.match(app, /function playPoolImpact\(/);
+assert.match(app, /function playPoolPocket\(/);
+assert.match(app, /function playFootballGoal\(/);
+assert.match(app, /showTurnNotice\(previousTurn/);
+assert.match(css, /\.turn-banner/);
+assert.match(css, /\.turn-banner\.show/);
+assert.match(sw, /\.\/shared\/feedback\.js/);
+console.log('ttak turn/audio UI wiring tests passed');
