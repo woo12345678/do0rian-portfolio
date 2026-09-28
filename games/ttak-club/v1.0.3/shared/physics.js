@@ -39,7 +39,7 @@
     const constrain = o => {
       if (!o.active) return;
       const pocket=board.pockets&&(o.kind==='cue'||o.kind==='pool')&&board.pockets.find(hole=>Math.hypot(o.x-hole.x,o.y-hole.y)<hole.r);
-      if(pocket){o.active=false;o.vx=o.vy=0;emit({type:'pocket',id:o.id,number:o.number,team:o.team,kind:o.kind});return;}
+      if(pocket){o.active=false;o.vx=o.vy=0;emit({type:'pocket',id:o.id,number:o.number,team:o.team,kind:o.kind,x:pocket.x,y:pocket.y});return;}
       if (walls) {
         if (open.left ? o.x + o.radius <= left : o.x - o.radius < left) { if(open.left){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;} o.x = left + o.radius; o.vx = Math.abs(o.vx) * restitution; }
         if (open.right ? o.x - o.radius >= right : o.x + o.radius > right) { if(open.right){o.active=false;o.vx=o.vy=0;emit({type:'out',id:o.id,team:o.team});return;} o.x = right - o.radius; o.vx = -Math.abs(o.vx) * restitution; }

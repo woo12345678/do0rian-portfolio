@@ -3,11 +3,12 @@
   else root.TtakFeedback=factory();
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
-  function turnNotice({previousTurn,nextTurn,phase,ai=false}){
+  function turnNotice({previousTurn,nextTurn,phase,reason='',ai=false}){
     if(phase==='finished')return null;
     const base={from:previousTurn,to:nextTurn,ai:!!ai};
     if(phase==='counter')return{kind:'counter',...base};
-    return{kind:previousTurn===nextTurn?'continue':'change',...base};
+    if(reason==='counter-ended')return{kind:'counter-end',...base};
+    return{kind:previousTurn===nextTurn?'same':'change',...base};
   }
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
   function audioCue(mode,event){
