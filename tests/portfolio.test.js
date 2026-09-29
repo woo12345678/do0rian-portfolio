@@ -152,9 +152,9 @@ stitchkeeperRuntimeFiles.forEach(file => {
 });
 
 const gulpSourceRepo = 'C:/Users/UOU/portfolio-game-gulp-goal';
-const gulpSourceSha = 'e971952f4f62a7351983455deb4efd436b510ae8';
-const gulpPlayUrl = 'games/gulp-goal/v1.0.0/';
-const gulpInventorySha256 = '3821f353b99a7206cdf5e0d3debd679d2f93feb0cac448c7ece4eedf781d736d';
+const gulpSourceSha = '4dfce476cdb4fc2e9544beb63c51b4816654d251';
+const gulpPlayUrl = 'games/gulp-goal/v1.1.0/';
+const gulpInventorySha256 = '594d7ab46df7f07084d900651560933c8ec9f00a6ddd08247601842570a89f10';
 assert(gulpGoal, 'GULP! GOAL! MAYHEM card is required.');
 assert.strictEqual(gulpGoal.title, 'GULP! GOAL! MAYHEM / 꿀꺽! 골! 대소동');
 assert.strictEqual(gulpGoal.url, 'gulp-goal.html');
@@ -163,20 +163,23 @@ assert.strictEqual(gulpGoal.image, 'assets/projects/gulp-goal-volley.png');
 assert.strictEqual(gulpGoal.kind, 'game');
 assert.strictEqual(gulpGoal.featured, undefined);
 assert.strictEqual(gulpGoal.platform, 'BROWSER · STATIC SINGLE · OFFLINE');
-assert.strictEqual(gulpGoal.impact, '3 Districts · 3 Crew Types · 999K Logical Volley Cap · 28/28 Tests PASS');
-['Hypercasual Mashup', 'Size-Gated Growth', 'Crowd Volley', 'Canvas 2D', 'Web Audio', 'Deterministic'].forEach(tag => assert(gulpGoal.tags.includes(tag), `GULP card needs tag ${tag}.`));
-['원포인터', '크기', '포털', '캡슐', '3종', '크루', '관중', '콤보', '게이트', '논리', '3개 구역', '골키퍼', '5초', '오버드라이브'].forEach(claim => assert(gulpGoal.summary.includes(claim), `GULP summary needs connected claim: ${claim}`));
+assert.strictEqual(gulpGoal.impact, '3 Districts · 3 Crew Types · 999K Logical Volley Cap · 35/35 Tests PASS');
+['Eat-to-Shoot Loop', 'Next Shot Growth', 'Crowd Volley', 'Canvas 2D', 'Web Audio', 'Deterministic'].forEach(tag => assert(gulpGoal.tags.includes(tag), `GULP card needs tag ${tag}.`));
+['Hypercasual Mashup', 'Size-Gated Growth'].forEach(tag => assert(!gulpGoal.tags.includes(tag), `GULP card must remove stale tag ${tag}.`));
+['좌우', '작은 것', '먹', '다음 슛', '준비한 공', '골', '크루', '게이트', '오버드라이브', '3개 구역', '999K'].forEach(claim => assert(gulpGoal.summary.includes(claim), `GULP summary needs single-loop claim: ${claim}`));
 ['게임 기획', '아트 디렉션', 'Canvas 2D', 'authored procedural visuals', 'Web Audio', '결정론', 'QA'].forEach(claim => assert(gulpGoal.role.includes(claim), `GULP role needs ${claim}.`));
 
 const gulpReleaseDir = path.join(root, gulpPlayUrl);
 const gulpRuntimeFiles = ['game-rules.js', 'game.js', 'index.html', 'styles.css'];
 assert.deepStrictEqual(listFiles(gulpReleaseDir).sort(), ['build-info.json', ...gulpRuntimeFiles].sort(), 'GULP release must contain only the runtime allowlist and build info.');
 const gulpBuildInfo = JSON.parse(fs.readFileSync(path.join(gulpReleaseDir, 'build-info.json'), 'utf8'));
-assert.deepStrictEqual(gulpBuildInfo, { version: '1.0.0', sourceSha: gulpSourceSha, edition: 'static-single', online: false, testCount: 28, inventorySha256: gulpInventorySha256 });
+assert.deepStrictEqual(gulpBuildInfo, { version: '1.1.0', sourceSha: gulpSourceSha, edition: 'static-single', online: false, testCount: 35, inventorySha256: gulpInventorySha256 });
 const gulpInventory = crypto.createHash('sha256').update(gulpRuntimeFiles.sort().map(file => {
-  const deployedBlob = execFileSync('git', ['show', `:games/gulp-goal/v1.0.0/${file}`], { cwd: root });
+  const deployedBlob = execFileSync('git', ['show', `:${gulpPlayUrl}${file}`], { cwd: root });
   const reviewedBlob = execFileSync('git', ['-C', gulpSourceRepo, 'show', `${gulpSourceSha}:${file}`]);
   assert.deepStrictEqual(deployedBlob, reviewedBlob, `GULP ${file} staged blob must exactly match its reviewed source Git blob byte-for-byte.`);
+  const loneCrMutation = Buffer.concat([deployedBlob.subarray(0, 1), Buffer.from('\r'), deployedBlob.subarray(1)]);
+  assert.notDeepStrictEqual(loneCrMutation, reviewedBlob, `GULP ${file} parity must fail closed on a lone CR mutation.`);
   return `${crypto.createHash('sha256').update(deployedBlob).digest('hex')}  ${file}\n`;
 }).join('')).digest('hex');
 assert.strictEqual(gulpInventory, gulpInventorySha256, 'GULP runtime inventory must match the independently pinned digest.');
@@ -191,23 +194,29 @@ assert(/<main/.test(gulpDetail) && /<h1[^>]*id="gulp-goal-title"/.test(gulpDetai
 assert(/meta name="description" content="[^"]*[가-힣]/.test(gulpDetail), 'GULP detail needs a Korean meta description.');
 assert(/href="\.\/"/.test(gulpDetail) && /포트폴리오로 돌아가기/.test(gulpDetail));
 assert(gulpDetail.includes(`href="${gulpPlayUrl}"`) && /PLAY PUBLIC WEB BUILD/.test(gulpDetail));
-['3 DISTRICTS', '3 CREW TYPES', '5s OVERDRIVE', '28/28 TESTS PASS'].forEach(metric => assert(gulpDetail.includes(metric), `GULP detail needs metric ${metric}.`));
+['3 DISTRICTS', '3 CREW TYPES', '5s OVERDRIVE', '35/35 TESTS PASS'].forEach(metric => assert(gulpDetail.includes(metric), `GULP detail needs metric ${metric}.`));
 ['launcher', 'twin-popper', 'goalie-breaker', '+8 CREW', '×2 VOLLEY', 'FOCUS', '999999', 'seed', 'best score', 'replay'].forEach(claim => assert(new RegExp(claim.replace('+', '\\+'), 'i').test(gulpDetail), `GULP detail needs ${claim}.`));
-['작은', '삼키', '포털', '콤보', '충전', '논리', '파티클', '후프', '블로커', '움직이는 최종 골키퍼', '승리', '패배'].forEach(claim => assert(gulpDetail.includes(claim), `GULP detail needs connected-loop claim: ${claim}`));
+['작은', '삼키', '다음 슛', '준비', '콤보', '충전', '논리', '파티클', '후프', '블로커', '움직이는 최종 골키퍼', '승리', '패배'].forEach(claim => assert(gulpDetail.includes(claim), `GULP detail needs connected-loop claim: ${claim}`));
 assert(/5초[^<]*오버드라이브|오버드라이브[^<]*5초/.test(gulpDetail) && /수동/.test(gulpDetail) && /가득/.test(gulpDetail));
-assert(/STATIC SINGLE-PLAYER EDITION/.test(gulpDetail) && /오프라인/.test(gulpDetail) && /28\/28/.test(gulpDetail));
+['내 구멍 · 좌우 이동', '먹기 +슛', '골대 도착 · 전부 발사!', '크루 +3', '게이트', '2단계', '골대까지', '준비 수', '준비한 공', '실제 골', 'Replay'].forEach(claim => assert(gulpDetail.includes(claim), `GULP detail needs current UI explanation: ${claim}`));
+assert(/STATIC SINGLE-PLAYER EDITION/.test(gulpDetail) && /오프라인/.test(gulpDetail) && /35\/35/.test(gulpDetail));
+assert(!/28\/28|v1\.0\.0|곱하여|곱셈/.test(`${JSON.stringify(gulpGoal)}\n${gulpDetail}`), 'Active GULP copy must not retain stale release or misleading multiplication copy.');
+assert(fs.existsSync(path.join(root, 'games/gulp-goal/v1.0.0/build-info.json')), 'The historical GULP v1.0.0 artifact must remain preserved.');
 assert(/오리지널/.test(gulpDetail) && /테이블탑/.test(gulpDetail) && /에디토리얼/.test(gulpDetail) && /복사한 에셋 없이/.test(gulpDetail));
 assert(!/downloadable|multiplayer support|online play|온라인 플레이/i.test(`${JSON.stringify(gulpGoal)}\n${gulpDetail}`));
 assert(/data-project-id="gulp-goal"[^}]+object-position:[^}]+/.test(css), 'GULP card needs an explicit readable crop.');
 
 const gulpImages = [
-  ['assets/projects/gulp-goal-volley.png', [1920, 1080], '9d46d5dfef29d3e773eca0cace69a6c39a5ee37b92fa0f6df9804fcaf5d498e1'],
-  ['assets/projects/gulp-goal-title.png', [1920, 1080], 'b08e3501246180a812aff4109f12379b9dba268783eef8a632c75f0e4d5f1a64'],
-  ['assets/projects/gulp-goal-portrait.png', [780, 1688], '2a85f9c72af6e201d92a8922bf4a3a236a4ad563d2fde12c1cae532b82b84743']
+  ['assets/projects/gulp-goal-volley.png', 'artifacts/browser-smoke/goal-volley.png', [1920, 1080], '587a507f4f2d9a5a4e99794a57aa8d67b932377a02ade307c10d7b0b6c02a199'],
+  ['assets/projects/gulp-goal-title.png', 'artifacts/browser-smoke/desktop-title.png', [1920, 1080], 'f2f021180ad50369679150c1b648e4e490da58e55f962a8932eb2ba48b89aaeb'],
+  ['assets/projects/gulp-goal-portrait.png', 'artifacts/browser-smoke/portrait.png', [780, 1688], '2076b66e5f95023320f90f956a6e9a734368f49154e67d9ce86237194178e735']
 ];
-gulpImages.forEach(([file, dimensions, sha256], index) => {
+gulpImages.forEach(([file, sourcePath, dimensions, sha256], index) => {
   assert.deepStrictEqual(pngDimensions(file), dimensions);
-  assert.strictEqual(crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex'), sha256, `${file} must match the exact source Git blob.`);
+  const stagedImage = execFileSync('git', ['show', `:${file}`], { cwd: root });
+  const sourceImage = execFileSync('git', ['-C', gulpSourceRepo, 'show', `${gulpSourceSha}:${sourcePath}`]);
+  assert.deepStrictEqual(stagedImage, sourceImage, `${file} staged bytes must equal the exact source Git blob.`);
+  assert.strictEqual(crypto.createHash('sha256').update(stagedImage).digest('hex'), sha256, `${file} must match the independently pinned source digest.`);
   assert(gulpDetail.includes(file), `${file} must be referenced by the detail page.`);
   const tag = gulpDetail.match(new RegExp(`<img[^>]+src="${file}"[^>]*>`));
   assert(tag && /alt="[^"]*[가-힣][^"]*"/.test(tag[0]), `${file} needs an accurate Korean alt.`);
@@ -215,7 +224,7 @@ gulpImages.forEach(([file, dimensions, sha256], index) => {
 });
 assert(!/<img[^>]+gulp-goal-volley\.png[^>]+loading="lazy"/.test(gulpDetail), 'GULP hero volley image should load eagerly.');
 const gulpPortraitTag = gulpDetail.match(/<img[^>]+gulp-goal-portrait\.png[^>]*>/)?.[0] || '';
-['조작 안내', '포털', '세 명의 크루', '하단 HUD'].forEach(claim => assert(gulpPortraitTag.includes(claim), `GULP portrait alt must describe visible ${claim}.`));
+['NEXT SHOT', '2단계', '준비한 공', '실시간 골', '골대', '후프', '공', '크루', '하단 HUD'].forEach(claim => assert(gulpPortraitTag.includes(claim), `GULP portrait alt must describe visible ${claim}.`));
 assert(!gulpPortraitTag.includes('차선 게이트'), 'GULP portrait alt must not claim a lane gate that is not visible.');
 function pngDimensions(file) {
   const bytes = fs.readFileSync(path.join(root, file));

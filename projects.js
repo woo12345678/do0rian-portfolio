@@ -120,15 +120,15 @@
       id: 'gulp-goal',
       title: 'GULP! GOAL! MAYHEM / 꿀꺽! 골! 대소동',
       url: 'gulp-goal.html',
-      playUrl: 'games/gulp-goal/v1.0.0/',
+      playUrl: 'games/gulp-goal/v1.1.0/',
       image: 'assets/projects/gulp-goal-volley.png',
       kind: 'game',
       platform: 'BROWSER · STATIC SINGLE · OFFLINE',
-      summary: '원포인터 조향으로 더 작은 물체만 크기 게이트에 맞춰 삼켜 포털·콤보·충전을 키우고, 캡슐과 선택 게이트로 3종 크루를 확장한다. 관중·크기·콤보·게이트가 화면의 공은 제한하면서 논리상 거대한 발리 포화를 키우며, 3개 구역과 움직이는 최종 골키퍼를 지나 가득 찼을 때 수동으로 5초 오버드라이브를 터뜨린다.',
-      impact: '3 Districts · 3 Crew Types · 999K Logical Volley Cap · 28/28 Tests PASS',
+      summary: '좌우로 구멍을 움직여 작은 것을 먹을 때마다 다음 슛 숫자를 키우고, 도로 끝에서 준비한 공을 모두 골대로 날리는 하나의 Eat-to-Shoot 루프. 3종 크루, 게이트, 5초 오버드라이브는 모두 같은 다음 슛 수치에 보너스를 더하며, 3개 구역과 999K 논리 상한을 이어 간다.',
+      impact: '3 Districts · 3 Crew Types · 999K Logical Volley Cap · 35/35 Tests PASS',
       role: '오리지널 게임 기획 · 아트 디렉션 · Canvas 2D authored procedural visuals · Web Audio · 결정론 시스템 · QA',
       collaboration: true,
-      tags: ['Hypercasual Mashup', 'Size-Gated Growth', 'Crowd Volley', 'Canvas 2D', 'Web Audio', 'Deterministic']
+      tags: ['Eat-to-Shoot Loop', 'Next Shot Growth', 'Crowd Volley', 'Canvas 2D', 'Web Audio', 'Deterministic']
     },
     {
       id: 'hannun-life-help',
