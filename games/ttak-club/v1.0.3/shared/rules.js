@@ -15,7 +15,8 @@
     classic:{grid:{lines:19,left:294,top:54,spacing:34},stars:[3,9,15].flatMap(row=>[3,9,15].map(column=>({column,row}))),frame:{x:270,y:30,w:660,h:660}},
     football:{orientation:'vertical',goals:{x1:500,x2:700},touchline:{x:310,y:20,w:580,h:680},halfway:{y:360},center:{x:600,y:360,radius:72},penaltyBoxes:[{x:430,y:20,w:340,h:125},{x:430,y:575,w:340,h:125}]},
     footballLarge:{orientation:'vertical',goals:{x1:450,x2:750},touchline:{x:150,y:20,w:900,h:680},halfway:{y:360},center:{x:600,y:360,radius:88},penaltyBoxes:[{x:350,y:20,w:500,h:145},{x:350,y:555,w:500,h:145}]},
-    pool:{playfield:{x:150,y:40,w:900,h:640},pockets:[{x:150,y:40,r:35},{x:600,y:40,r:32},{x:1050,y:40,r:35},{x:150,y:680,r:35},{x:600,y:680,r:32},{x:1050,y:680,r:35}]}
+    pool:{playfield:{x:150,y:40,w:900,h:640},pockets:[{x:150,y:40,r:35},{x:600,y:40,r:32},{x:1050,y:40,r:35},{x:150,y:680,r:35},{x:600,y:680,r:32},{x:1050,y:680,r:35}]},
+    curling:{playfield:{x:300,y:20,w:600,h:680},house:{center:{x:600,y:145},radius:100},hogLineY:430,backLineY:60,hack:{x:600,y:655}}
   });
   const LINE_LAYOUTS=deepFreeze([
     {id:'h-close',kind:'horizontal',a:{x:70,y:410},b:{x:1130,y:410},spawns:[{x:520,y:630},{x:680,y:630}]},
@@ -112,14 +113,16 @@
     if(increment)g.targetResetCount++;
   }
   function createGame(opts={}) {
-    serial=0; const mode=opts.mode||'classic', requestedPlayers=Math.max(1,Math.min(5,opts.players||2)), players=mode==='football'||mode==='pool'?2:requestedPlayers, s=opts.settings||{};
+    serial=0; const mode=opts.mode||'classic', requestedPlayers=Math.max(1,Math.min(5,opts.players||2)), players=['football','pool','curling'].includes(mode)?2:requestedPlayers, s=opts.settings||{};
     const settings={...s};
     if(mode==='classic')settings.formation=Object.hasOwn(FORMATIONS,s.formation)?s.formation:'standard';
+    if(mode==='curling'){const stones=Number(s.stonesPerTeam),ends=Number(s.ends);settings.stonesPerTeam=Number.isFinite(stones)?Math.max(1,Math.min(8,Math.trunc(stones))):4;settings.ends=Number.isFinite(ends)?Math.max(1,Math.min(10,Math.trunc(ends))):2;}
     const firstTurn=s.firstPlayer==='ai'?Math.min(1,players-1):s.firstPlayer==='random'?Math.min(players-1,Math.floor(Math.max(0,Math.min(.999999,Number((typeof opts.rng==='function'?opts.rng:Math.random)())||0))*players)):0;
     const g={mode,players,settings,phase:'aiming',turn:firstTurn,round:1,shot:0,winner:null,scores:Array(players).fill(0),objects:[],board:{width:W,height:H,walls:false,orientation:'vertical'},events:[]};
     if(mode==='classic'){g.board.geometry=FIELD_GEOMETRY.classic;g.board.playfield=FIELD_GEOMETRY.classic.frame;g.board.surface='baduk';g.objects=classicPieces(Math.max(1,Math.min(20,s.discs||5)),settings.formation,players);}
     if(mode==='football'){const discs=Number(s.discs)===5?5:3,geometry=discs===5?FIELD_GEOMETRY.footballLarge:FIELD_GEOMETRY.football;settings.discs=discs;g.board.walls=true;g.board.geometry=geometry;g.board.playfield=geometry.touchline;g.board.goals={...geometry.goals};g.board.surface='grass';g.objects=verticalRows(players,discs,23,geometry);g.objects.push(P.body({id:'ball',kind:'ball',x:600,y:360,radius:20,mass:.65}));}
     if(mode==='pool'){const geometry=FIELD_GEOMETRY.pool;g.board.walls=true;g.board.surface='pool';g.board.geometry=geometry;g.board.playfield=geometry.playfield;g.board.pockets=geometry.pockets;g.board.friction=.55;g.board.restitution=.9;g.poolGroups=[null,null];g.objects=poolPieces();}
+    if(mode==='curling'){const geometry=FIELD_GEOMETRY.curling;g.board={width:W,height:H,walls:false,orientation:'vertical',surface:'ice',geometry,playfield:geometry.playfield,house:geometry.house,friction:.65,restitution:.84};g.end=1;g.extraEnds=0;g.throwsInEnd=0;g.endFirstTeam=firstTurn;setupCurlingEnd(g,firstTurn);}
     if(mode==='line'){const layout=chooseLineLayout(opts.rng,s.lineLayout),safeSign=Math.sign(lineCross(layout,layout.spawns[0]))||1,spawns=lineSpawnPoints(layout,players);g.board={width:W,height:H,walls:true,orientation:'vertical',targetLine:{id:layout.id,kind:layout.kind,a:{...layout.a},b:{...layout.b},safeSign}};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=spawns.map((spawn,t)=>disc(t,spawn.x,spawn.y));}
     if(mode==='golf'){g.board.walls=true;g.hole=0; setupHole(g);}
     if(mode==='coop'){g.players=players;g.turnBudget=12;g.wave=1;g.counterInterval=({easy:5,normal:4,hard:3})[s.difficulty]||4;g.turnsUntilCounter=g.counterInterval;spawnCoop(g);}
@@ -129,9 +132,18 @@
   }
   function setupHole(g){const h=HOLES[g.hole];g.board={width:W,height:H,walls:true,orientation:'vertical',surface:'golf',cup:{...h.cup},puttingGreen:h.puttingGreen,fairway:h.fairway,bunkers:h.bunkers,rocks:h.rocks,rough:h.rough,holeName:h.name};g.objects=Array.from({length:g.players},(_,t)=>disc(t,h.tee.x,h.tee.y+(t-(g.players-1)/2)*58));g.objects.push(...h.rocks.map((r,i)=>P.body({id:`rock${g.hole}-${i}`,kind:'rock',x:r.x,y:r.y,radius:r.r,mass:1000})));}
   function spawnCoop(g){g.board={width:W,height:H,walls:false};g.turnsUntilCounter=g.counterInterval;g.objects=Array.from({length:g.players},(_,t)=>disc(t,160,250+t*70));for(let i=0;i<2+g.wave;i++)g.objects.push(P.body({id:`g${g.wave}-${i}`,kind:'goblin',team:-1,x:720+i*75,y:230+(i%3)*120,radius:i===0?34:27,mass:i===0?2.5:1,heavy:i===0}));}
+  function spawnCurlingStone(g){const stone=disc(g.turn,g.board.geometry.hack.x,g.board.geometry.hack.y,{radius:25,mass:1.08,friction:g.board.friction});g.objects.push(stone);g.currentStoneId=stone.id;g.phase='aiming';return stone;}
+  function setupCurlingEnd(g,firstTeam){g.objects=[];g.throwsInEnd=0;g.endFirstTeam=firstTeam;g.turn=firstTeam;g.hammer=1-firstTeam;g.round=g.end;spawnCurlingStone(g);}
+  function curlingScore(objects,house){
+    const ranked=objects.filter(object=>object.active&&object.kind==='disc').map(object=>({team:object.team,distance:Math.hypot(object.x-house.center.x,object.y-house.center.y),radius:object.radius||25})).filter(item=>item.distance<=house.radius+item.radius).sort((a,b)=>a.distance-b.distance);
+    if(!ranked.length||ranked[1]&&ranked[0].team!==ranked[1].team&&Math.abs(ranked[0].distance-ranked[1].distance)<1e-6)return{team:null,points:0};
+    const team=ranked[0].team,opponentDistance=ranked.find(item=>item.team!==team)?.distance??Infinity;
+    return{team,points:ranked.filter(item=>item.team===team&&item.distance<opponentDistance-1e-6).length};
+  }
   function eligibleObjects(g, player=g.turn){
     if(g.phase!=='aiming')return[];
     if(g.mode==='pool')return g.objects.filter(o=>o.active&&o.kind==='cue');
+    if(g.mode==='curling')return g.objects.filter(o=>o.active&&o.id===g.currentStoneId);
     if(g.mode==='coop')return g.objects.filter(o=>o.active&&o.kind==='disc'&&o.team===player);
     return g.objects.filter(o=>o.active&&o.kind==='disc'&&o.team===player);
   }
@@ -170,6 +182,15 @@
   }
   function resolve(g,events=[]){events=P.accumulateEvents([],events);g.phase='resolution';g.events=events;
     if(g.mode==='pool'){resolvePool(g,events);return;}
+    if(g.mode==='curling'){
+      const delivered=g.objects.find(object=>object.id===g.currentStoneId),geometry=g.board.geometry,contacted=events.some(event=>event.type==='impact');
+      if(delivered?.active&&((delivered.y+delivered.radius>=geometry.hogLineY&&!contacted)||delivered.y+delivered.radius<geometry.backLineY))delivered.active=false;
+      g.throwsInEnd++;
+      if(g.throwsInEnd<g.settings.stonesPerTeam*2){g.turn=1-g.turn;spawnCurlingStone(g);return;}
+      const result=curlingScore(g.objects,g.board.house);if(result.team!=null)g.scores[result.team]+=result.points;g.lastEndScore=result;
+      if(g.end>=g.settings.ends&&g.scores[0]!==g.scores[1]){g.winner=g.scores[0]>g.scores[1]?0:1;g.phase='finished';return;}
+      const nextFirst=result.team==null?g.endFirstTeam:result.team;g.end++;if(g.end>g.settings.ends)g.extraEnds++;setupCurlingEnd(g,nextFirst);return;
+    }
     if(g.mode==='coop'&&g.counterActive){g.counterActive=false;g.turnsUntilCounter=g.counterInterval;if(!g.objects.some(o=>o.active&&o.kind==='disc')){g.phase='finished';g.winner=null;return;}if(!g.objects.some(o=>o.active&&o.kind==='goblin')){g.wave++;if(g.wave>3){g.phase='finished';g.winner=0;return;}g.turnBudget+=8;spawnCoop(g);}if(g.turnBudget<=0){g.phase='finished';g.winner=null;return;}ensureActiveTurn(g);return;}
     if(g.mode==='classic'){const alive=new Set(g.objects.filter(o=>o.active).map(o=>o.team));if((g.players===1&&alive.size===0)||(g.players>1&&alive.size<=1)){g.phase='finished';g.winner=g.players>1?([...alive][0]??null):null;return;}}
     if(g.mode==='football'){for(const e of events.filter(e=>e.type==='goal')){const scorer=e.side==='top'?0:1;g.scores[scorer]++;const ball=g.objects.find(o=>o.kind==='ball');Object.assign(ball,{x:600,y:360,vx:0,vy:0,active:true});if(g.scores[scorer]>=Math.max(1,g.settings.targetScore||3)){g.winner=scorer;g.phase='finished';return;}}}
@@ -187,5 +208,5 @@
     const outcome=cooperative?(g.winner==null?'defeat':'victory'):solo?(g.winner==null?'defeat':'victory'):g.winner==null?'draw':'competitive-win';
     return {mode:g.mode,outcome,winner:g.winner,defeated:g.winner==null?[]:Array.from({length:g.players},(_,i)=>i).filter(i=>i!==g.winner)};
   }
-  return {MODES:['classic','football','line','golf','coop','royal','chain','pool'],FORMATIONS,FIELD_GEOMETRY,LINE_LAYOUTS,lineMeasure,lineTarget,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
+  return {MODES:['classic','football','line','golf','coop','royal','chain','pool','curling'],FORMATIONS,FIELD_GEOMETRY,LINE_LAYOUTS,lineMeasure,lineTarget,curlingScore,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
 });

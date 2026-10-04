@@ -74,3 +74,18 @@ body:has(#game:not(.hidden)) .margin{display:none}
 .turn-banner span{font:800 clamp(12px,2.2vw,18px)/1.2 system-ui,sans-serif;letter-spacing:.08em;color:#f0dfbd}
 .turn-banner strong{display:block;margin-top:8px;font:900 clamp(27px,5.3vw,54px)/1 system-ui,sans-serif;text-shadow:0 3px 0 #0008}
 @media(max-width:520px){.turn-banner{min-height:108px;padding:14px 18px;border-width:4px}.turn-banner strong{font-size:clamp(24px,8vw,38px)}}
+@media(max-width:520px) and (min-height:501px){
+body:has(#game:not(.hidden)) main{grid-template-columns:0 minmax(0,1fr) 0;margin:0 8px}
+body:has(#game:not(.hidden)) .margin{display:none}
+.game{padding:14px 10px 24px}
+.gamebar{display:grid;grid-template-columns:auto minmax(0,1fr) 48px auto;grid-template-rows:auto auto;align-items:center;gap:8px 10px;min-height:0;overflow:visible}
+.gamebar>#leave{grid-column:1;grid-row:1;white-space:nowrap;min-height:48px;padding:8px}
+.gamebar>div:nth-child(2){grid-column:2;grid-row:1;min-width:0}
+.gamebar>div:nth-child(2) strong{display:block;font-size:20px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gamebar>div:nth-child(2) span{display:block;margin-top:3px;font-size:13px;line-height:1.25;white-space:normal;overflow-wrap:break-word}
+.gamebar>.score{grid-column:1/-1;grid-row:2;justify-self:stretch;text-align:center;font-size:17px;line-height:1.25;padding:10px 6px;border-top:1px solid #a3473566;border-bottom:1px solid #a3473566;white-space:normal}
+.gamebar>.guide-icon{grid-column:3;grid-row:1;min-width:48px;width:48px;height:48px}
+.gamebar>#pause{grid-column:4;grid-row:1;min-height:48px;padding:8px;white-space:nowrap}
+.canvaswrap{margin-top:10px}
+.hint{font-size:13px;line-height:1.45;padding:10px 6px}
+}

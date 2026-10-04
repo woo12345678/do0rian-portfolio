@@ -16,8 +16,8 @@ assert.match(app, /game\.mode==='pool'/, 'Pool has mode-specific UI/gameplay wir
 assert.match(app, /game\.poolFoul==='early-eight'/, 'Pool result explains an early 8-ball loss');
 assert.match(app, /game\.poolFoul==='scratch-eight'/, 'Pool result explains an 8-ball scratch loss');
 assert.match(html, /id="amountWrap"/, 'generic amount control can be hidden for Pool');
-assert.match(app, /여덟 가지 손맛/);
-assert.match(app, /EIGHT TABLE TALES/);
+assert.match(app, /아홉 가지 손맛/);
+assert.match(app, /NINE TABLE TALES/);
 
 for (const [locale, copy] of Object.entries(context.window.TTAK_GUIDE_LOCALES)) {
   assert.ok(copy.modeNames.pool, `${locale} Pool mode name`);
