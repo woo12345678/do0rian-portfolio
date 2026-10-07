@@ -5,6 +5,25 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   return [
     {
+      id: 'pack-pop-panic',
+      title: '꽉! 팡! — PACK! POP! PANIC',
+      category: 'Games',
+      year: 2026,
+      url: 'pack-pop-panic.html',
+      playUrl: 'games/pack-pop-panic/v1.0.0/',
+      liveUrl: 'https://woo12345678.github.io/do0rian-portfolio/games/pack-pop-panic/v1.0.0/',
+      sourceUrl: 'https://github.com/woo12345678/pack-pop-panic',
+      image: 'assets/pack-pop-panic/hero.png',
+      kind: 'game',
+      platform: 'BROWSER · STATIC SINGLE · OFFLINE',
+      testCount: 17,
+      summary: '누르고 모은 하나의 수치를 떼는 순간 순차 연쇄 폭발로 소비하는 원 버튼 철거 아케이드.',
+      impact: '3 Lots · 3 Charges Each · 17/17 Tests PASS',
+      role: '게임 기획 · Canvas 2D · 결정론 규칙 · Web Audio · 접근성 · 브라우저 QA',
+      collaboration: true,
+      tags: ['One Button', 'Chain Explosion', 'Canvas 2D', 'Deterministic', 'Accessibility']
+    },
+    {
       id: 'magic-brick',
       title: 'Magic Brick: Strategic Breaker',
       url: 'https://play.google.com/store/apps/details?id=com.DOORIAN.Magic_Brick',

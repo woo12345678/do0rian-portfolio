@@ -8,7 +8,7 @@ const projects = require('../projects.js');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 
-assert.strictEqual(projects.length, 30, '포트폴리오에는 현재 30개 프로젝트가 있어야 합니다.');
+assert.strictEqual(projects.length, 31, '포트폴리오에는 현재 31개 프로젝트가 있어야 합니다.');
 assert.strictEqual(new Set(projects.map(p => p.id)).size, projects.length, '프로젝트 ID는 고유해야 합니다.');
 projects.forEach(project => {
   ['id', 'title', 'url', 'image', 'kind', 'summary'].forEach(key => assert(project[key], `${project.id || 'project'}: ${key} 필드가 필요합니다.`));
@@ -19,9 +19,22 @@ projects.forEach(project => {
 
 const featured = projects.filter(p => p.featured);
 assert.deepStrictEqual(featured.map(p => p.id), ['magic-brick', 'make-tteok', 'neon-dash-waves']);
+const packPopPanic = projects.find(p => p.id === 'pack-pop-panic');
+assert(packPopPanic, 'PACK! POP! PANIC 프로젝트가 필요합니다.');
+assert.strictEqual(projects[0], packPopPanic, 'PACK! POP! PANIC은 첫 프로젝트 카드여야 합니다.');
+assert.strictEqual(packPopPanic.title, '꽉! 팡! — PACK! POP! PANIC');
+assert.strictEqual(packPopPanic.category, 'Games');
+assert.strictEqual(packPopPanic.year, 2026);
+assert.strictEqual(packPopPanic.url, 'pack-pop-panic.html');
+assert.strictEqual(packPopPanic.playUrl, 'games/pack-pop-panic/v1.0.0/');
+assert.strictEqual(packPopPanic.liveUrl, 'https://woo12345678.github.io/do0rian-portfolio/games/pack-pop-panic/v1.0.0/');
+assert.strictEqual(packPopPanic.sourceUrl, 'https://github.com/woo12345678/pack-pop-panic');
+assert.strictEqual(packPopPanic.image, 'assets/pack-pop-panic/hero.png');
+assert.strictEqual(packPopPanic.testCount, 17);
+assert(/원 버튼|one-button/i.test(packPopPanic.summary) && /연쇄 폭발/.test(packPopPanic.summary));
 const realDrive = projects.find(p => p.id === 'realdrive-horizon');
 assert(realDrive, 'RealDrive Horizon 프로젝트가 필요합니다.');
-assert.strictEqual(projects.indexOf(realDrive), 3, 'RealDrive Horizon은 featured 다음 archive 최상단에 있어야 합니다.');
+assert.strictEqual(projects.indexOf(realDrive), 4, 'RealDrive Horizon은 기존 순서를 보존해야 합니다.');
 assert.strictEqual(realDrive.url, 'https://woo12345678.github.io/do0rian-portfolio/realdrive-horizon.html');
 assert.strictEqual(realDrive.image, 'assets/projects/realdrive-horizon.png');
 assert.strictEqual(realDrive.kind, 'game');
@@ -35,8 +48,8 @@ const vaultClick = projects.find(p => p.id === 'vault-click');
 const stitchkeeper = projects.find(p => p.id === 'stitchkeeper');
 const gulpGoal = projects.find(p => p.id === 'gulp-goal');
 const stitchkeeperInventorySha256 = '47c8ba506d16065e29cf1b3b247c3bb86d6ad4c02040de121c79c326a49f2860';
-assert.deepStrictEqual(projects.slice(3, 9).map(p => p.id), ['realdrive-horizon', 'ttak-club', 'echo-front', 'vault-click', 'stitchkeeper', 'gulp-goal'], '게임 순서를 보존하고 GULP! GOAL! MAYHEM을 Stitchkeeper 직후에 배치해야 합니다.');
-assert.notStrictEqual(projects[9].kind, 'game', 'GULP! GOAL! MAYHEM은 비게임 프로젝트 바로 앞에 있어야 합니다.');
+assert.deepStrictEqual(projects.slice(4, 10).map(p => p.id), ['realdrive-horizon', 'ttak-club', 'echo-front', 'vault-click', 'stitchkeeper', 'gulp-goal'], '기존 게임 순서를 보존해야 합니다.');
+assert.notStrictEqual(projects[10].kind, 'game', 'GULP! GOAL! MAYHEM은 비게임 프로젝트 바로 앞에 있어야 합니다.');
 [
   [ttakClub, 'games/ttak-club/v1.0.3/', 'assets/projects/ttak-club-home.png', /7 Modes/, /119\/119/],
   [echoFront, 'https://woo12345678.github.io/do0rian-portfolio/echo-front.html', 'assets/projects/echo-front.png', /52 Heroes.*9 Modes.*11 Maps/, /96\/96/]
@@ -231,6 +244,42 @@ function pngDimensions(file) {
   assert.strictEqual(bytes.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', `${file} needs a valid PNG signature.`);
   return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
 }
+const packSourceRepo = 'C:/Users/UOU/pack-pop-panic';
+const packSourceSha = 'dad1fc5844b49295d957951443bd41cea4da28a3';
+const packReleaseRelative = 'games/pack-pop-panic/v1.0.0';
+const packReleaseDir = path.join(root, packReleaseRelative);
+const packRuntimeFiles = ['game.js', 'index.html', 'rules.js', 'styles.css'];
+assert.deepStrictEqual(listFiles(packReleaseDir).sort(), ['build-info.json', ...packRuntimeFiles].sort(), 'PACK runtime allowlist must contain only four runtime files and build-info.json.');
+const packBuildInfo = JSON.parse(fs.readFileSync(path.join(packReleaseDir, 'build-info.json'), 'utf8'));
+assert.strictEqual(packBuildInfo.sourceSha, packSourceSha);
+assert.strictEqual(packBuildInfo.testCount, 17);
+assert.deepStrictEqual(packBuildInfo.inventory.map(entry => entry.file), packRuntimeFiles, 'PACK inventory must be sorted.');
+packBuildInfo.inventory.forEach(entry => {
+  const deployed = fs.readFileSync(path.join(packReleaseDir, entry.file));
+  const reviewed = execFileSync('git', ['-C', packSourceRepo, 'show', `${packSourceSha}:${entry.file}`]);
+  assert.deepStrictEqual(deployed, reviewed, `${entry.file} must equal the approved source Git blob byte-for-byte.`);
+  assert.strictEqual(entry.sha256, crypto.createHash('sha256').update(deployed).digest('hex'));
+});
+const packRuntimeIndex = fs.readFileSync(path.join(packReleaseDir, 'index.html'), 'utf8');
+['styles.css', 'rules.js', 'game.js'].forEach(ref => assert(packRuntimeIndex.includes(ref), `PACK runtime must resolve relative ${ref}.`));
+assert(!/(?:src|href)=["'](?:\/|https?:)/i.test(packRuntimeIndex), 'PACK runtime must not use absolute runtime assets.');
+['README.md', 'tests', 'evidence'].forEach(sourceOnly => assert(!fs.existsSync(path.join(packReleaseDir, sourceOnly)), `PACK runtime must exclude ${sourceOnly}.`));
+const packDetail = fs.readFileSync(path.join(root, 'pack-pop-panic.html'), 'utf8');
+['HOLD', 'pointer', 'Space', 'THIS BLAST', 'release', 'sequential chain explosion', 'PERFECT ×2', 'overheat 60%', 'R relays', '+5 gold', 'three charges per lot', 'three escalating lots', '17/17', 'browser smoke QA', 'desktop', 'mobile', 'pause', 'keyboard', 'accessibility', packSourceSha].forEach(claim => assert(packDetail.includes(claim), `PACK detail needs verified claim: ${claim}`));
+assert(/href="games\/pack-pop-panic\/v1\.0\.0\/index\.html"[^>]*>\s*PLAY NOW/i.test(packDetail));
+assert(packDetail.includes(`href="${packPopPanic.sourceUrl}"`) && packDetail.includes('href="https://woo12345678.github.io/pack-pop-panic/"'));
+assert.notStrictEqual(packPopPanic.sourceUrl, packPopPanic.liveUrl);
+[
+  ['assets/pack-pop-panic/hero.png', 'evidence/03-huge-explosion.png'],
+  ['assets/pack-pop-panic/gameplay.png', 'evidence/02-first-five-seconds.png'],
+  ['assets/pack-pop-panic/result.png', 'evidence/04-result.png'],
+  ['assets/pack-pop-panic/portrait.png', 'evidence/05-portrait-390x844@2x.png']
+].forEach(([asset, source]) => {
+  const bytes = fs.readFileSync(path.join(root, asset));
+  assert.deepStrictEqual(bytes, execFileSync('git', ['-C', packSourceRepo, 'show', `${packSourceSha}:${source}`]), `${asset} must equal approved evidence blob.`);
+  assert(packDetail.includes(asset));
+  assert(new RegExp(`<img[^>]+src="${asset}"[^>]+alt="[^"]+"`).test(packDetail), `${asset} needs meaningful alt text.`);
+});
 [
   ['assets/projects/stitchkeeper-game.png', [1424, 905], 'f06677b97c46714081159a622d8894a293b43b97a4d85cc0351bcaa4f830b723'],
   ['assets/projects/stitchkeeper-title.png', [1424, 905], '70b55eb6c3d8e5bd7d4d9efccc400004ddaed64ca8a3488860aeae76991959a2'],
@@ -254,8 +303,11 @@ const ttakReleaseFiles = [
   'icon.svg',
   'index.html',
   'js/app.js',
+  'js/guide-locales.js',
   'manifest.webmanifest',
   'shared/ai.js',
+  'shared/feedback.js',
+  'shared/haptics.js',
   'shared/physics.js',
   'shared/rules.js',
   'sw.js'
@@ -271,11 +323,11 @@ assert.deepStrictEqual(listFiles(ttakReleaseDir).sort(), ttakReleaseFiles);
 const ttakBuildInfo = JSON.parse(fs.readFileSync(path.join(ttakReleaseDir, 'build-info.json'), 'utf8'));
 assert.deepStrictEqual(ttakBuildInfo, {
   version: '1.0.3',
-  sourceSha: '6fa828c92869532b1dac99e7b6e6373e28da64cd',
+  sourceSha: '524957c590aa9058a451fce110661b00f821789d',
   edition: 'static-single-local',
   online: false,
   testCount: 119,
-  inventorySha256: '6121c8847d2958dd73961bfceecf9db562f00c04085561e100975044a9b5b705'
+  inventorySha256: 'e93db3b63f7b4e2a9b9582bb0e217cb6ebaa1cc5b6542308e3bbfcee25f32b23'
 });
 const ttakRuntimeFiles = ttakReleaseFiles.filter(file => file !== 'build-info.json' && !file.endsWith('.zip')).sort();
 const ttakInventory = crypto.createHash('sha256').update(ttakRuntimeFiles.map(file => {
@@ -287,7 +339,7 @@ assert.strictEqual(ttakInventory, ttakBuildInfo.inventorySha256, 'deployed TTAK 
 const ttakZip = fs.readFileSync(path.join(ttakReleaseDir, 'TTAK-Table-Club-v1.0.3-itch.zip'));
 assert.strictEqual(crypto.createHash('sha256').update(ttakZip).digest('hex'), '051c88475bdc072d8ad2ab61013e505436416d407af843763ce3a5447a16d6bd');
 const ttakReleaseIndex = fs.readFileSync(path.join(ttakReleaseDir, 'index.html'), 'utf8');
-['./manifest.webmanifest', './css/style.css', './css/pigments.css', './shared/physics.js', './shared/rules.js', './shared/ai.js', './js/app.js']
+['./manifest.webmanifest', './css/style.css', './css/pigments.css', './shared/physics.js', './shared/rules.js', './shared/ai.js', './shared/feedback.js', './shared/haptics.js', './js/guide-locales.js', './js/app.js']
   .forEach(asset => assert(ttakReleaseIndex.includes(asset), `TTAK release index must use relative asset ${asset}`));
 assert(!/socket\.io|<script[^>]+src=["'](?:https?:)?\/\//i.test(ttakReleaseIndex), 'TTAK static index must not load a socket or remote script.');
 assert(!/data-flow=["']online["']|id=["'](?:onlineBox|createRoom|joinRoom|copyCode)["']/i.test(ttakReleaseIndex), 'TTAK static index must not expose online-only DOM.');
@@ -333,7 +385,7 @@ const realDriveDetail = fs.readFileSync(realDriveDetailPath, 'utf8');
 ].forEach(text => assert(realDriveDetail.includes(text), `RealDrive 상세 페이지에 ${text} 정보가 필요합니다.`));
 assert(/아직 공개 다운로드를 제공하지 않습니다/.test(realDriveDetail), '개발 중인 게임을 공개된 것처럼 보이면 안 됩니다.');
 assert(!/29(?:개 프로젝트| PROJECTS|<\/b> BUILDS)/.test(html), 'Home metadata and content must not retain the stale project count 29.');
-assert(/30개 프로젝트/.test(html) && /30 PROJECTS/.test(html) && /data-count="30"/.test(html) && /id="projectCount">30</.test(html), 'Home metadata and content must consistently expose 30 projects.');
+assert(/31개 프로젝트/.test(html) && /31 PROJECTS/.test(html) && /data-count="31"/.test(html) && /id="projectCount">31</.test(html), 'Home metadata and content must consistently expose 31 projects.');
 assert(/realdrive-detail/.test(css), 'RealDrive 상세 페이지 전용 반응형 스타일이 필요합니다.');
 assert(/@media\(max-width:900px\)\{\.rd-hero\{grid-template-columns:minmax\(0,1fr\)/.test(css), '모바일 1열 hero는 큰 이미지 때문에 viewport를 넘지 않아야 합니다.');
 assert(/prefers-reduced-motion/.test(css), '상세 페이지도 모션 감소 접근성을 유지해야 합니다.');

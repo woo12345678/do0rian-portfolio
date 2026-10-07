@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "sourceSha": "dad1fc5844b49295d957951443bd41cea4da28a3",
+  "testCount": 17,
+  "inventory": [
+    {
+      "file": "game.js",
+      "sha256": "76c9f2c4573f57f2ab2bf15aa1440de4502553f9917c05614c21697cc22bdbc2"
+    },
+    {
+      "file": "index.html",
+      "sha256": "15be50808fcab2b1293157069b5b4ee3651e35f3248af5e0c98868f81184ba7e"
+    },
+    {
+      "file": "rules.js",
+      "sha256": "283a65ca4bf924b39b058064b8fddeac48d64dcc6dd014d27728fe2cdc2ae930"
+    },
+    {
+      "file": "styles.css",
+      "sha256": "535778787bf5c6286c3306c0cf162358795663f87663032ab48727737a87604e"
+    }
+  ]
+}

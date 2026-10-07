@@ -1,8 +1,8 @@
 {
   "version": "1.0.3",
-  "sourceSha": "6fa828c92869532b1dac99e7b6e6373e28da64cd",
+  "sourceSha": "524957c590aa9058a451fce110661b00f821789d",
   "edition": "static-single-local",
   "online": false,
   "testCount": 119,
-  "inventorySha256": "6121c8847d2958dd73961bfceecf9db562f00c04085561e100975044a9b5b705"
+  "inventorySha256": "e93db3b63f7b4e2a9b9582bb0e217cb6ebaa1cc5b6542308e3bbfcee25f32b23"
 }
