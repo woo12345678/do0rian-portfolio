@@ -10,7 +10,8 @@ for (const difficulty of ['easy','normal','hard']) {
   stone.team = 1;
   const shot = AI.chooseShot(game, difficulty, 2401);
   assert.ok(shot && shot.id === stone.id, `${difficulty}: AI selects delivery stone`);
-  assert.ok(shot.force.y < 0, `${difficulty}: AI throws toward the house`);
+  assert.ok(shot.force.x > 0, `${difficulty}: AI throws right toward the horizontal house`);
+  assert.ok(Math.abs(shot.force.x)>Math.abs(shot.force.y)*5, `${difficulty}: delivery primarily follows the horizontal sheet`);
   P.applyShot(stone, shot.force);
   for(let step=0;step<30000&&!P.allResting(game.objects);step++) P.step(game.objects,1/120,game.board);
   const distance = Math.hypot(stone.x-game.board.house.center.x,stone.y-game.board.house.center.y);

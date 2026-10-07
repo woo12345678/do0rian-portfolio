@@ -27,6 +27,6 @@ assert.match(app, /function silenceAudio\(/, 'lifecycle can stop scheduled audio
 assert.match(app, /resetLifecycle\(\)[\s\S]*silenceAudio\(\)/, 'reset closes active and scheduled audio');
 assert.match(css, /\.turn-banner/);
 assert.match(css, /\.turn-banner\.show/);
-assert.match(sw, /ttak-static-v1\.0\.3-curling-16/, 'latest release must invalidate the deployed service-worker cache');
+assert.match(sw, /ttak-static-v1\.0\.3-curling-horizontal-17/, 'latest release must invalidate the deployed service-worker cache');
 assert.match(sw, /\.\/shared\/feedback\.js/);
 console.log('ttak turn/audio UI wiring tests passed');

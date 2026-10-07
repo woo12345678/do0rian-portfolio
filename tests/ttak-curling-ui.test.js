@@ -6,7 +6,7 @@ const app = fs.readFileSync(`${base}/js/app.js`, 'utf8');
 const html = fs.readFileSync(`${base}/index.html`, 'utf8');
 const sw = fs.readFileSync(`${base}/sw.js`, 'utf8');
 
-assert.match(sw, /ttak-static-v1\.0\.3-curling-16/, 'Curling update invalidates the offline cache');
+assert.match(sw, /ttak-static-v1\.0\.3-curling-horizontal-17/, 'Horizontal Curling update invalidates the offline cache');
 assert.match(app, /curling:\{name:'라이트 컬링'/, 'Korean mode card exists');
 assert.match(app, /curling:\{name:'Light Curling'/, 'English mode card exists');
 assert.match(app, /아홉 가지 손맛/);
@@ -20,6 +20,9 @@ assert.match(app, /stonesPerTeam:\+\$\('#curlingStones'\)\.value/);
 assert.match(app, /ends:\+\$\('#curlingEnds'\)\.value/);
 assert.match(app, /game\.mode==='curling'/, 'canvas renders a Curling sheet');
 assert.match(app, /game\.board\.house/, 'canvas uses rules-owned house geometry');
+assert.match(app, /geometry\.hogLineX/, 'canvas renders the horizontal hog line');
+assert.match(app, /geometry\.backLineX/, 'canvas renders the horizontal back line');
+assert.match(app, /game\.mode==='curling'\?180:100/, 'keyboard Space uses the longer horizontal Curling pull');
 assert.match(app, /game\.end.*game\.settings\.ends/, 'HUD exposes end progress');
 assert.match(app, /game\.hammer/, 'HUD exposes the hammer team');
 assert.match(app, /stonesPerTeam:game\.settings\?\.stonesPerTeam/, 'QA state exposes configured stones');

@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const R = require('../games/ttak-club/v1.0.3/shared/rules');
+const P = require('../games/ttak-club/v1.0.3/shared/physics');
 
 assert.ok(R.MODES.includes('curling'), 'curling is a selectable mode');
 
@@ -8,9 +9,22 @@ assert.equal(defaults.players, 2, 'curling is always two teams');
 assert.equal(defaults.settings.stonesPerTeam, 4, 'quick default uses four stones per team');
 assert.equal(defaults.settings.ends, 2, 'quick default uses two ends');
 assert.equal(defaults.board.surface, 'ice');
-assert.ok(defaults.board.friction <= .7, 'ice must slide much longer than the default board');
-assert.deepEqual(defaults.board.house.center, {x:600,y:145});
+assert.equal(defaults.board.friction, 1.65, 'curling uses the normal tabletop deceleration');
+assert.equal(defaults.board.orientation, 'horizontal', 'curling deliveries travel left to right');
+assert.ok(defaults.board.playfield.w > defaults.board.playfield.h * 2, 'the sheet is visibly horizontal');
+assert.deepEqual(defaults.board.house.center, {x:1020,y:360});
+assert.deepEqual(defaults.board.geometry.hack, {x:230,y:360});
+assert.ok(defaults.board.house.center.x-defaults.board.geometry.hack.x >= 750, 'horizontal sheet has a longer delivery distance');
 assert.equal(R.eligibleObjects(defaults).length, 1, 'only the current delivery stone is playable');
+
+const humanDraw = R.createGame({mode:'curling', settings:{stonesPerTeam:1,ends:1}});
+const humanStone = R.eligibleObjects(humanDraw)[0];
+assert.ok(R.markShot(humanDraw, humanStone.id));
+P.applyShot(humanStone, {x:180*7.2,y:0});
+let humanSteps=0;
+for(;humanSteps<600&&!P.allResting(humanDraw.objects);humanSteps++) P.step(humanDraw.objects,1/120,humanDraw.board);
+assert.ok(P.allResting(humanDraw.objects), 'normal-friction delivery stops within five seconds');
+assert.ok(Math.hypot(humanStone.x-humanDraw.board.house.center.x,humanStone.y-humanDraw.board.house.center.y)<=humanDraw.board.house.radius+humanStone.radius, 'a practical 180px pull reaches the distant house');
 
 const long = R.createGame({mode:'curling', players:2, settings:{stonesPerTeam:8, ends:10}});
 assert.equal(long.settings.stonesPerTeam, 8);
@@ -32,35 +46,35 @@ assert.equal(nonFinite.settings.ends, 2, 'non-finite end count uses the light de
 const shortStone = R.createGame({mode:'curling', settings:{stonesPerTeam:2, ends:1}});
 const shortId = shortStone.currentStoneId;
 assert.ok(R.markShot(shortStone, shortId));
-shortStone.objects.find(object => object.id === shortId).y = 500;
+shortStone.objects.find(object => object.id === shortId).x = 500;
 R.resolve(shortStone, []);
 assert.equal(shortStone.objects.find(object => object.id === shortId).active, false, 'stone that never fully crosses the hog line is removed');
 
 const touchedStone = R.createGame({mode:'curling', settings:{stonesPerTeam:2, ends:1}});
 const touchedId = touchedStone.currentStoneId;
 assert.ok(R.markShot(touchedStone, touchedId));
-touchedStone.objects.find(object => object.id === touchedId).y = 500;
+touchedStone.objects.find(object => object.id === touchedId).x = 500;
 R.resolve(touchedStone, [{type:'impact', strength:100}]);
 assert.equal(touchedStone.objects.find(object => object.id === touchedId).active, true, 'a delivered stone that contacted another stone is exempt from the hog-line removal');
 
 const backStone = R.createGame({mode:'curling', settings:{stonesPerTeam:2, ends:1}});
 const backId = backStone.currentStoneId;
 assert.ok(R.markShot(backStone, backId));
-backStone.objects.find(object => object.id === backId).y = 30;
+backStone.objects.find(object => object.id === backId).x = 1170;
 R.resolve(backStone, []);
 assert.equal(backStone.objects.find(object => object.id === backId).active, false, 'stone fully beyond the back line is removed');
 
-const house = {center:{x:600,y:145}, radius:100};
+const house = {center:{x:1020,y:360}, radius:100};
 const score = R.curlingScore([
-  {active:true,kind:'disc',team:0,x:620,y:145,radius:25},
-  {active:true,kind:'disc',team:0,x:670,y:145,radius:25},
-  {active:true,kind:'disc',team:1,x:650,y:145,radius:25},
-  {active:true,kind:'disc',team:1,x:900,y:145,radius:25}
+  {active:true,kind:'disc',team:0,x:1040,y:360,radius:25},
+  {active:true,kind:'disc',team:0,x:1090,y:360,radius:25},
+  {active:true,kind:'disc',team:1,x:1070,y:360,radius:25},
+  {active:true,kind:'disc',team:1,x:700,y:360,radius:25}
 ], house);
 assert.deepEqual(score, {team:0,points:1}, 'only stones closer than the opponent nearest stone score');
 assert.deepEqual(R.curlingScore([
-  {active:true,kind:'disc',team:0,x:620,y:145,radius:25},
-  {active:true,kind:'disc',team:1,x:580,y:145,radius:25}
+  {active:true,kind:'disc',team:0,x:1040,y:360,radius:25},
+  {active:true,kind:'disc',team:1,x:1000,y:360,radius:25}
 ], house), {team:null,points:0}, 'an exact measurement tie is a blank end');
 
 function deliver(game, x, y) {
@@ -73,22 +87,22 @@ function deliver(game, x, y) {
 
 const oneEnd = R.createGame({mode:'curling', settings:{stonesPerTeam:1, ends:1}});
 assert.equal(oneEnd.turn, 0);
-deliver(oneEnd, 620, 145);
+deliver(oneEnd, 1040, 360);
 assert.equal(oneEnd.turn, 1, 'teams alternate deliveries');
 assert.equal(oneEnd.objects.length, 2, 'delivered stones remain in play while a new stone appears');
-deliver(oneEnd, 665, 145);
+deliver(oneEnd, 1085, 360);
 assert.equal(oneEnd.phase, 'finished');
 assert.deepEqual(oneEnd.scores, [1,0]);
 assert.equal(oneEnd.winner, 0);
 
 const match = R.createGame({mode:'curling', settings:{stonesPerTeam:1, ends:2}});
-deliver(match, 620,145);
-deliver(match, 680,145);
+deliver(match, 1040,360);
+deliver(match, 1100,360);
 assert.equal(match.end, 2);
 assert.equal(match.turn, 0, 'the scoring team throws first next end, giving the opponent hammer');
 assert.equal(match.hammer, 1);
-deliver(match, 690,145);
-deliver(match, 620,145);
+deliver(match, 1110,360);
+deliver(match, 1040,360);
 assert.equal(match.end, 3, 'a tied scheduled match creates an extra end');
 assert.equal(match.extraEnds, 1);
 assert.equal(match.phase, 'aiming');

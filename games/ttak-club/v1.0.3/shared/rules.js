@@ -16,7 +16,7 @@
     football:{orientation:'vertical',goals:{x1:500,x2:700},touchline:{x:310,y:20,w:580,h:680},halfway:{y:360},center:{x:600,y:360,radius:72},penaltyBoxes:[{x:430,y:20,w:340,h:125},{x:430,y:575,w:340,h:125}]},
     footballLarge:{orientation:'vertical',goals:{x1:450,x2:750},touchline:{x:150,y:20,w:900,h:680},halfway:{y:360},center:{x:600,y:360,radius:88},penaltyBoxes:[{x:350,y:20,w:500,h:145},{x:350,y:555,w:500,h:145}]},
     pool:{playfield:{x:150,y:40,w:900,h:640},pockets:[{x:150,y:40,r:35},{x:600,y:40,r:32},{x:1050,y:40,r:35},{x:150,y:680,r:35},{x:600,y:680,r:32},{x:1050,y:680,r:35}]},
-    curling:{playfield:{x:300,y:20,w:600,h:680},house:{center:{x:600,y:145},radius:100},hogLineY:430,backLineY:60,hack:{x:600,y:655}}
+    curling:{playfield:{x:40,y:160,w:1120,h:400},house:{center:{x:1020,y:360},radius:100},hogLineX:620,backLineX:1135,hack:{x:230,y:360}}
   });
   const LINE_LAYOUTS=deepFreeze([
     {id:'h-close',kind:'horizontal',a:{x:70,y:410},b:{x:1130,y:410},spawns:[{x:520,y:630},{x:680,y:630}]},
@@ -122,7 +122,7 @@
     if(mode==='classic'){g.board.geometry=FIELD_GEOMETRY.classic;g.board.playfield=FIELD_GEOMETRY.classic.frame;g.board.surface='baduk';g.objects=classicPieces(Math.max(1,Math.min(20,s.discs||5)),settings.formation,players);}
     if(mode==='football'){const discs=Number(s.discs)===5?5:3,geometry=discs===5?FIELD_GEOMETRY.footballLarge:FIELD_GEOMETRY.football;settings.discs=discs;g.board.walls=true;g.board.geometry=geometry;g.board.playfield=geometry.touchline;g.board.goals={...geometry.goals};g.board.surface='grass';g.objects=verticalRows(players,discs,23,geometry);g.objects.push(P.body({id:'ball',kind:'ball',x:600,y:360,radius:20,mass:.65}));}
     if(mode==='pool'){const geometry=FIELD_GEOMETRY.pool;g.board.walls=true;g.board.surface='pool';g.board.geometry=geometry;g.board.playfield=geometry.playfield;g.board.pockets=geometry.pockets;g.board.friction=.55;g.board.restitution=.9;g.poolGroups=[null,null];g.objects=poolPieces();}
-    if(mode==='curling'){const geometry=FIELD_GEOMETRY.curling;g.board={width:W,height:H,walls:false,orientation:'vertical',surface:'ice',geometry,playfield:geometry.playfield,house:geometry.house,friction:.65,restitution:.84};g.end=1;g.extraEnds=0;g.throwsInEnd=0;g.endFirstTeam=firstTurn;setupCurlingEnd(g,firstTurn);}
+    if(mode==='curling'){const geometry=FIELD_GEOMETRY.curling;g.board={width:W,height:H,walls:false,orientation:'horizontal',surface:'ice',geometry,playfield:geometry.playfield,house:geometry.house,friction:1.65,restitution:.84};g.end=1;g.extraEnds=0;g.throwsInEnd=0;g.endFirstTeam=firstTurn;setupCurlingEnd(g,firstTurn);}
     if(mode==='line'){const layout=chooseLineLayout(opts.rng,s.lineLayout),safeSign=Math.sign(lineCross(layout,layout.spawns[0]))||1,spawns=lineSpawnPoints(layout,players);g.board={width:W,height:H,walls:true,orientation:'vertical',targetLine:{id:layout.id,kind:layout.kind,a:{...layout.a},b:{...layout.b},safeSign}};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=spawns.map((spawn,t)=>disc(t,spawn.x,spawn.y));}
     if(mode==='golf'){g.board.walls=true;g.hole=0; setupHole(g);}
     if(mode==='coop'){g.players=players;g.turnBudget=12;g.wave=1;g.counterInterval=({easy:5,normal:4,hard:3})[s.difficulty]||4;g.turnsUntilCounter=g.counterInterval;spawnCoop(g);}
@@ -184,7 +184,7 @@
     if(g.mode==='pool'){resolvePool(g,events);return;}
     if(g.mode==='curling'){
       const delivered=g.objects.find(object=>object.id===g.currentStoneId),geometry=g.board.geometry,contacted=events.some(event=>event.type==='impact');
-      if(delivered?.active&&((delivered.y+delivered.radius>=geometry.hogLineY&&!contacted)||delivered.y+delivered.radius<geometry.backLineY))delivered.active=false;
+      if(delivered?.active&&((delivered.x-delivered.radius<=geometry.hogLineX&&!contacted)||delivered.x-delivered.radius>geometry.backLineX))delivered.active=false;
       g.throwsInEnd++;
       if(g.throwsInEnd<g.settings.stonesPerTeam*2){g.turn=1-g.turn;spawnCurlingStone(g);return;}
       const result=curlingScore(g.objects,g.board.house);if(result.team!=null)g.scores[result.team]+=result.points;g.lastEndScore=result;

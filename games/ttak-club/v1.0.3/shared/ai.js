@@ -65,8 +65,8 @@
     return shotToward(disc,target,power,{...profile,jitter:profile.jitter*.12},random);
   }
   function curlingShot(g,disc,profile,random,difficulty){
-    const spread=({easy:70,normal:38,hard:16})[difficulty]||38,target={x:g.board.house.center.x+(random()-.5)*spread,y:g.board.house.center.y+(random()-.5)*spread*.5};
-    const travel=distance(disc,target),friction=g.board.friction||.65,dt=1/120,travelPerSpeed=dt/(1-Math.exp(-friction*dt)),power=travel/travelPerSpeed+P.REST_SPEED;
+    const spread=({easy:70,normal:38,hard:16})[difficulty]||38,target={x:g.board.house.center.x+(random()-.5)*spread*.5,y:g.board.house.center.y+(random()-.5)*spread};
+    const travel=distance(disc,target),friction=g.board.friction||1.65,dt=1/120,travelPerSpeed=dt/(1-Math.exp(-friction*dt)),power=travel/travelPerSpeed+P.REST_SPEED;
     return shotToward(disc,target,power,{...profile,jitter:0},random);
   }
   function segmentDistance(a,b,p){
