@@ -122,7 +122,7 @@
     if(mode==='classic'){g.board.geometry=FIELD_GEOMETRY.classic;g.board.playfield=FIELD_GEOMETRY.classic.frame;g.board.surface='baduk';g.objects=classicPieces(Math.max(1,Math.min(20,s.discs||5)),settings.formation,players);}
     if(mode==='football'){const discs=Number(s.discs)===5?5:3,geometry=discs===5?FIELD_GEOMETRY.footballLarge:FIELD_GEOMETRY.football;settings.discs=discs;g.board.walls=true;g.board.geometry=geometry;g.board.playfield=geometry.touchline;g.board.goals={...geometry.goals};g.board.surface='grass';g.objects=verticalRows(players,discs,23,geometry);g.objects.push(P.body({id:'ball',kind:'ball',x:600,y:360,radius:20,mass:.65}));}
     if(mode==='pool'){const geometry=FIELD_GEOMETRY.pool;g.board.walls=true;g.board.surface='pool';g.board.geometry=geometry;g.board.playfield=geometry.playfield;g.board.pockets=geometry.pockets;g.board.friction=.55;g.board.restitution=.9;g.poolGroups=[null,null];g.objects=poolPieces();}
-    if(mode==='curling'){const geometry=FIELD_GEOMETRY.curling;g.board={width:W,height:H,walls:false,orientation:'horizontal',surface:'ice',geometry,playfield:geometry.playfield,house:geometry.house,friction:1.65,restitution:.84};g.end=1;g.extraEnds=0;g.throwsInEnd=0;g.endFirstTeam=firstTurn;setupCurlingEnd(g,firstTurn);}
+    if(mode==='curling'){const geometry=FIELD_GEOMETRY.curling;g.board={width:W,height:H,walls:false,orientation:'horizontal',surface:'ice',geometry,playfield:geometry.playfield,house:geometry.house,friction:1.65,restitution:.84};g.end=1;g.extraEnds=0;g.throwsInEnd=0;g.endHistory=[];g.endFirstTeam=firstTurn;setupCurlingEnd(g,firstTurn);}
     if(mode==='line'){const layout=chooseLineLayout(opts.rng,s.lineLayout),safeSign=Math.sign(lineCross(layout,layout.spawns[0]))||1,spawns=lineSpawnPoints(layout,players);g.board={width:W,height:H,walls:true,orientation:'vertical',targetLine:{id:layout.id,kind:layout.kind,a:{...layout.a},b:{...layout.b},safeSign}};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=spawns.map((spawn,t)=>disc(t,spawn.x,spawn.y));}
     if(mode==='golf'){g.board.walls=true;g.hole=0; setupHole(g);}
     if(mode==='coop'){g.players=players;g.turnBudget=12;g.wave=1;g.counterInterval=({easy:5,normal:4,hard:3})[s.difficulty]||4;g.turnsUntilCounter=g.counterInterval;spawnCoop(g);}
@@ -187,7 +187,7 @@
       if(delivered?.active&&((delivered.x-delivered.radius<=geometry.hogLineX&&!contacted)||delivered.x-delivered.radius>geometry.backLineX))delivered.active=false;
       g.throwsInEnd++;
       if(g.throwsInEnd<g.settings.stonesPerTeam*2){g.turn=1-g.turn;spawnCurlingStone(g);return;}
-      const result=curlingScore(g.objects,g.board.house);if(result.team!=null)g.scores[result.team]+=result.points;g.lastEndScore=result;
+      const result=curlingScore(g.objects,g.board.house);if(result.team!=null)g.scores[result.team]+=result.points;g.lastEndScore=result;g.endHistory.push({end:g.end,team:result.team,points:result.points,scores:[...g.scores]});
       if(g.end>=g.settings.ends&&g.scores[0]!==g.scores[1]){g.winner=g.scores[0]>g.scores[1]?0:1;g.phase='finished';return;}
       const nextFirst=result.team==null?g.endFirstTeam:result.team;g.end++;if(g.end>g.settings.ends)g.extraEnds++;setupCurlingEnd(g,nextFirst);return;
     }

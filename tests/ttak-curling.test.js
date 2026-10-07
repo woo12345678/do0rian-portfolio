@@ -98,6 +98,7 @@ assert.equal(oneEnd.winner, 0);
 const match = R.createGame({mode:'curling', settings:{stonesPerTeam:1, ends:2}});
 deliver(match, 1040,360);
 deliver(match, 1100,360);
+assert.deepEqual(match.endHistory, [{end:1,team:0,points:1,scores:[1,0]}], 'completed-end history records the winner, points, and cumulative score');
 assert.equal(match.end, 2);
 assert.equal(match.turn, 0, 'the scoring team throws first next end, giving the opponent hammer');
 assert.equal(match.hammer, 1);

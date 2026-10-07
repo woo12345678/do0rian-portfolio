@@ -5,8 +5,9 @@ const base = 'games/ttak-club/v1.0.3';
 const app = fs.readFileSync(`${base}/js/app.js`, 'utf8');
 const html = fs.readFileSync(`${base}/index.html`, 'utf8');
 const sw = fs.readFileSync(`${base}/sw.js`, 'utf8');
+const css = fs.readFileSync(`${base}/css/style.css`, 'utf8');
 
-assert.match(sw, /ttak-static-v1\.0\.3-curling-horizontal-17/, 'Horizontal Curling update invalidates the offline cache');
+assert.match(sw, /ttak-static-v1\.0\.3-curling-scorecard-18/, 'Curling scorecard update invalidates the offline cache');
 assert.match(app, /curling:\{name:'라이트 컬링'/, 'Korean mode card exists');
 assert.match(app, /curling:\{name:'Light Curling'/, 'English mode card exists');
 assert.match(app, /아홉 가지 손맛/);
@@ -23,6 +24,11 @@ assert.match(app, /game\.board\.house/, 'canvas uses rules-owned house geometry'
 assert.match(app, /geometry\.hogLineX/, 'canvas renders the horizontal hog line');
 assert.match(app, /geometry\.backLineX/, 'canvas renders the horizontal back line');
 assert.match(app, /game\.mode==='curling'\?180:100/, 'keyboard Space uses the longer horizontal Curling pull');
+assert.match(html, /id="curlingScorecard"/, 'Curling has a persistent end-by-end scorecard');
+assert.match(css, /\.curling-scorecard/, 'Curling scorecard is positioned over unused rink margin');
+assert.match(app, /function renderCurlingScorecard\(/, 'Curling scorecard renders completed ends');
+assert.match(app, /function showCurlingEndNotice\(/, 'Curling announces each completed end');
+assert.match(app, /예: 1번 팀 돌 2개/, 'Korean guide explains scoring with a concrete example');
 assert.match(app, /game\.end.*game\.settings\.ends/, 'HUD exposes end progress');
 assert.match(app, /game\.hammer/, 'HUD exposes the hammer team');
 assert.match(app, /stonesPerTeam:game\.settings\?\.stonesPerTeam/, 'QA state exposes configured stones');
