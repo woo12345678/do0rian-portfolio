@@ -26,12 +26,15 @@ assert.strictEqual(packPopPanic.title, '꽉! 팡! — PACK! POP! PANIC');
 assert.strictEqual(packPopPanic.category, 'Games');
 assert.strictEqual(packPopPanic.year, 2026);
 assert.strictEqual(packPopPanic.url, 'pack-pop-panic.html');
-assert.strictEqual(packPopPanic.playUrl, 'games/pack-pop-panic/v1.0.0/');
-assert.strictEqual(packPopPanic.liveUrl, 'https://woo12345678.github.io/do0rian-portfolio/games/pack-pop-panic/v1.0.0/');
+assert.strictEqual(packPopPanic.playUrl, 'games/pack-pop-panic/v1.1.0/');
+assert.strictEqual(packPopPanic.liveUrl, 'https://woo12345678.github.io/do0rian-portfolio/games/pack-pop-panic/v1.1.0/');
 assert.strictEqual(packPopPanic.sourceUrl, 'https://github.com/woo12345678/pack-pop-panic');
 assert.strictEqual(packPopPanic.image, 'assets/pack-pop-panic/hero.png');
-assert.strictEqual(packPopPanic.testCount, 17);
-assert(/원 버튼|one-button/i.test(packPopPanic.summary) && /연쇄 폭발/.test(packPopPanic.summary));
+assert.strictEqual(packPopPanic.testCount, 23);
+assert(/원 버튼|one-button/i.test(packPopPanic.summary) && /THIS BLAST/.test(packPopPanic.summary));
+assert(/4 Lots/.test(packPopPanic.impact) && /9 Blueprint Tiers/.test(packPopPanic.impact) && /23\/23 Tests PASS/.test(packPopPanic.impact));
+['One Button', 'Seeded Lots', 'PACK · POP · PANIC', 'No Currency'].forEach(tag => assert(packPopPanic.tags.includes(tag), `PACK card needs truthful tag ${tag}.`));
+assert(!/v1\.0\.0/.test(`${packPopPanic.playUrl}\n${packPopPanic.liveUrl}`), 'PACK primary URLs must not retain v1.0.0.');
 const realDrive = projects.find(p => p.id === 'realdrive-horizon');
 assert(realDrive, 'RealDrive Horizon 프로젝트가 필요합니다.');
 assert.strictEqual(projects.indexOf(realDrive), 4, 'RealDrive Horizon은 기존 순서를 보존해야 합니다.');
@@ -245,35 +248,61 @@ function pngDimensions(file) {
   return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
 }
 const packSourceRepo = 'C:/Users/UOU/pack-pop-panic';
-const packSourceSha = 'dad1fc5844b49295d957951443bd41cea4da28a3';
-const packReleaseRelative = 'games/pack-pop-panic/v1.0.0';
-const packReleaseDir = path.join(root, packReleaseRelative);
+const packV1SourceSha = 'dad1fc5844b49295d957951443bd41cea4da28a3';
+const packV1ReleaseRelative = 'games/pack-pop-panic/v1.0.0';
+const packV1ReleaseDir = path.join(root, packV1ReleaseRelative);
 const packRuntimeFiles = ['game.js', 'index.html', 'rules.js', 'styles.css'];
-assert.deepStrictEqual(listFiles(packReleaseDir).sort(), ['build-info.json', ...packRuntimeFiles].sort(), 'PACK runtime allowlist must contain only four runtime files and build-info.json.');
+assert.deepStrictEqual(listFiles(packV1ReleaseDir).sort(), ['build-info.json', ...packRuntimeFiles].sort(), 'PACK v1.0 archive allowlist must remain intact.');
+const packV1BuildInfo = JSON.parse(fs.readFileSync(path.join(packV1ReleaseDir, 'build-info.json'), 'utf8'));
+assert.strictEqual(packV1BuildInfo.sourceSha, packV1SourceSha);
+assert.strictEqual(packV1BuildInfo.testCount, 17);
+assert.deepStrictEqual(packV1BuildInfo.inventory.map(entry => entry.file), packRuntimeFiles, 'PACK v1.0 inventory must remain sorted.');
+packV1BuildInfo.inventory.forEach(entry => {
+  const deployed = fs.readFileSync(path.join(packV1ReleaseDir, entry.file));
+  const reviewed = execFileSync('git', ['-C', packSourceRepo, 'show', `${packV1SourceSha}:${entry.file}`]);
+  assert.deepStrictEqual(deployed, reviewed, `Archived PACK v1.0 ${entry.file} must remain byte-identical to its approved source blob.`);
+  assert.strictEqual(entry.sha256, crypto.createHash('sha256').update(deployed).digest('hex'));
+});
+const packSourceSha = '6a1ebfbea92d3c93e3ffc106531a6366b83ee217';
+const packReleaseRelative = 'games/pack-pop-panic/v1.1.0';
+const packReleaseDir = path.join(root, packReleaseRelative);
+const expectedPackInventory = [
+  { file: 'game.js', bytes: 25057, sha256: '5879eb144799dda45904e0470572efb76f93e2a729070ca1cea2bb5b56ed0c18' },
+  { file: 'index.html', bytes: 3692, sha256: '2611e384f1fb80a1aaf39d3db180572b6f03d8fdf87ac5e423bbcb061eda3e4f' },
+  { file: 'rules.js', bytes: 12331, sha256: '5d020202ab315be6e942e0fc72e7fbe06132731c3a0678eaeabcf2288a62a954' },
+  { file: 'styles.css', bytes: 7443, sha256: 'd742f998c6cb4b09daf09eb16a630a16a3e05028b7781dbde50bf28e9ffb6419' }
+];
+const packInventorySha256 = '7ac89ffd2ff214e801994aec090c8f983798bdebff9613b94688acd07a8d4014';
+const packInventoryManifest = expectedPackInventory.slice().sort((a, b) => a.file.localeCompare(b.file)).map(entry => `${entry.sha256}  ${entry.file}\n`).join('');
+assert.strictEqual(crypto.createHash('sha256').update(packInventoryManifest).digest('hex'), packInventorySha256, 'PACK v1.1 inventory digest must remain independently pinned.');
+assert.deepStrictEqual(listFiles(packReleaseDir).sort(), ['build-info.json', ...packRuntimeFiles].sort(), 'PACK v1.1 runtime allowlist must contain only four runtime files and build-info.json.');
 const packBuildInfo = JSON.parse(fs.readFileSync(path.join(packReleaseDir, 'build-info.json'), 'utf8'));
-assert.strictEqual(packBuildInfo.sourceSha, packSourceSha);
-assert.strictEqual(packBuildInfo.testCount, 17);
-assert.deepStrictEqual(packBuildInfo.inventory.map(entry => entry.file), packRuntimeFiles, 'PACK inventory must be sorted.');
-packBuildInfo.inventory.forEach(entry => {
+assert.deepStrictEqual(packBuildInfo, { version: '1.1.0', edition: 'static-single', onlineRequired: false, sourceRepo: 'https://github.com/woo12345678/pack-pop-panic', sourceSha: packSourceSha, testCount: 23, inventorySha256: packInventorySha256, inventory: expectedPackInventory });
+expectedPackInventory.forEach(entry => {
   const deployed = fs.readFileSync(path.join(packReleaseDir, entry.file));
   const reviewed = execFileSync('git', ['-C', packSourceRepo, 'show', `${packSourceSha}:${entry.file}`]);
-  assert.deepStrictEqual(deployed, reviewed, `${entry.file} must equal the approved source Git blob byte-for-byte.`);
-  assert.strictEqual(entry.sha256, crypto.createHash('sha256').update(deployed).digest('hex'));
+  assert.deepStrictEqual(deployed, reviewed, `PACK v1.1 ${entry.file} must equal the approved source Git blob byte-for-byte.`);
+  assert.strictEqual(deployed.length, entry.bytes);
+  assert.strictEqual(crypto.createHash('sha256').update(deployed).digest('hex'), entry.sha256);
 });
 const packRuntimeIndex = fs.readFileSync(path.join(packReleaseDir, 'index.html'), 'utf8');
 ['styles.css', 'rules.js', 'game.js'].forEach(ref => assert(packRuntimeIndex.includes(ref), `PACK runtime must resolve relative ${ref}.`));
 assert(!/(?:src|href)=["'](?:\/|https?:)/i.test(packRuntimeIndex), 'PACK runtime must not use absolute runtime assets.');
 ['README.md', 'tests', 'evidence'].forEach(sourceOnly => assert(!fs.existsSync(path.join(packReleaseDir, sourceOnly)), `PACK runtime must exclude ${sourceOnly}.`));
 const packDetail = fs.readFileSync(path.join(root, 'pack-pop-panic.html'), 'utf8');
-['HOLD', 'pointer', 'Space', 'THIS BLAST', 'release', 'sequential chain explosion', 'PERFECT ×2', 'overheat 60%', 'R relays', '+5 gold', 'three charges per lot', 'three escalating lots', '17/17', 'browser smoke QA', 'desktop', 'mobile', 'pause', 'keyboard', 'accessibility', packSourceSha].forEach(claim => assert(packDetail.includes(claim), `PACK detail needs verified claim: ${claim}`));
-assert(/href="games\/pack-pop-panic\/v1\.0\.0\/index\.html"[^>]*>\s*PLAY NOW/i.test(packDetail));
+['HOLD', 'pointer', 'Space', 'THIS BLAST', 'RELEASE', 'sequential chain explosion', '4 LOTS', '3 CHARGES EACH', 'PACK', 'POP', 'PANIC', 'T3', 'hybrid', '23/23', 'browser smoke', 'pause', 'visibility', '390×844', '128-seed', 'four-lot winnability', 'no inventory', 'shop', 'currency', packSourceSha].forEach(claim => assert(packDetail.includes(claim), `PACK detail needs verified v1.1 claim: ${claim}`));
+assert(/href="games\/pack-pop-panic\/v1\.1\.0\/index\.html"[^>]*>\s*PLAY NOW v1\.1\.0/i.test(packDetail));
+assert(/href="games\/pack-pop-panic\/v1\.0\.0\/"[^>]*>[^<]*ARCHIVE/i.test(packDetail), 'PACK detail must link the preserved v1.0.0 archive without making it primary.');
 assert(packDetail.includes(`href="${packPopPanic.sourceUrl}"`) && packDetail.includes('href="https://woo12345678.github.io/pack-pop-panic/"'));
 assert.notStrictEqual(packPopPanic.sourceUrl, packPopPanic.liveUrl);
 [
-  ['assets/pack-pop-panic/hero.png', 'evidence/03-huge-explosion.png'],
-  ['assets/pack-pop-panic/gameplay.png', 'evidence/02-first-five-seconds.png'],
-  ['assets/pack-pop-panic/result.png', 'evidence/04-result.png'],
-  ['assets/pack-pop-panic/portrait.png', 'evidence/05-portrait-390x844@2x.png']
+  ['assets/pack-pop-panic/hero.png', 'evidence/06-huge-upgraded-explosion.png'],
+  ['assets/pack-pop-panic/gameplay.png', 'evidence/03-first-five-seconds.png'],
+  ['assets/pack-pop-panic/draft.png', 'evidence/04-draft-tree.png'],
+  ['assets/pack-pop-panic/upgraded.png', 'evidence/05-upgraded-hud.png'],
+  ['assets/pack-pop-panic/result.png', 'evidence/07-result-causality.png'],
+  ['assets/pack-pop-panic/portrait.png', 'evidence/08-portrait-390x844@2x.png'],
+  ['assets/pack-pop-panic/portrait-draft.png', 'evidence/09-draft-portrait-390x844@2x.png']
 ].forEach(([asset, source]) => {
   const bytes = fs.readFileSync(path.join(root, asset));
   assert.deepStrictEqual(bytes, execFileSync('git', ['-C', packSourceRepo, 'show', `${packSourceSha}:${source}`]), `${asset} must equal approved evidence blob.`);

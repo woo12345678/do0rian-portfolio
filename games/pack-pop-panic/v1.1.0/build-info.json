@@ -1,0 +1,31 @@
+{
+  "version": "1.1.0",
+  "edition": "static-single",
+  "onlineRequired": false,
+  "sourceRepo": "https://github.com/woo12345678/pack-pop-panic",
+  "sourceSha": "6a1ebfbea92d3c93e3ffc106531a6366b83ee217",
+  "testCount": 23,
+  "inventorySha256": "7ac89ffd2ff214e801994aec090c8f983798bdebff9613b94688acd07a8d4014",
+  "inventory": [
+    {
+      "file": "game.js",
+      "bytes": 25057,
+      "sha256": "5879eb144799dda45904e0470572efb76f93e2a729070ca1cea2bb5b56ed0c18"
+    },
+    {
+      "file": "index.html",
+      "bytes": 3692,
+      "sha256": "2611e384f1fb80a1aaf39d3db180572b6f03d8fdf87ac5e423bbcb061eda3e4f"
+    },
+    {
+      "file": "rules.js",
+      "bytes": 12331,
+      "sha256": "5d020202ab315be6e942e0fc72e7fbe06132731c3a0678eaeabcf2288a62a954"
+    },
+    {
+      "file": "styles.css",
+      "bytes": 7443,
+      "sha256": "d742f998c6cb4b09daf09eb16a630a16a3e05028b7781dbde50bf28e9ffb6419"
+    }
+  ]
+}
