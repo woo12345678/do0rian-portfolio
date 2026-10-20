@@ -12,6 +12,7 @@
     const m = Math.hypot(force.x, force.y) || 1, speed = Math.min(MAX_SPEED, m);
     o.vx = force.x / m * speed; o.vy = force.y / m * speed;
   }
+  function segmentDistance(a,b,p){const dx=b.x-a.x,dy=b.y-a.y,length2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/length2));return Math.hypot(p.x-(a.x+dx*t),p.y-(a.y+dy*t));}
   const eventKey = e => [e.type,e.id,e.side,e.number,e.team].map(value=>value??'').join('|');
   function accumulateEvents(pending=[],events=[]){const keys=new Set(pending.filter(event=>event.type!=='target').map(eventKey));for(const event of events){if(event.type==='target'){pending.push(event);continue;}const key=eventKey(event);if(!keys.has(key)){pending.push(event);keys.add(key);}}return pending;}
   function consumeEvents(state){const events=state.pendingEvents||[];state.pendingEvents=[];return events;}
@@ -63,9 +64,12 @@
     };
     for (const o of objects) if (o.active) {
       o.x += o.vx * dt; o.y += o.vy * dt;
+      const water=board.water&&o.kind==='disc'&&board.water.find(z=>((o.x-z.x)/z.rx)**2+((o.y-z.y)/z.ry)**2<1);
+      if(water){o.active=false;o.vx=o.vy=0;emit({type:'water',id:o.id,team:o.team,x:o.x,y:o.y});continue;}
       const inRough = board.rough && board.rough.some(z => o.x > z.x && o.x < z.x + z.w && o.y > z.y && o.y < z.y + z.h);
       const inBunker = board.bunkers && board.bunkers.some(z => ((o.x-z.x)/z.rx)**2+((o.y-z.y)/z.ry)**2<1);
-      const decay = Math.exp(-(o.friction ?? (inBunker ? 6.2 : inRough ? 4.2 : board.friction) ?? DEFAULT_FRICTION) * dt);
+      const inFairway=board.fairwayPath&&board.fairwayPath.slice(1).some((point,index)=>segmentDistance(board.fairwayPath[index],point,o)<=board.fairwayWidth/2);
+      const decay = Math.exp(-(o.friction ?? (inBunker ? 6.2 : inRough ? 4.2 : inFairway ? board.fairwayFriction : board.friction) ?? DEFAULT_FRICTION) * dt);
       o.vx *= decay; o.vy *= decay;
       if (Math.hypot(o.vx, o.vy) < REST_SPEED) o.vx = o.vy = 0;
       constrain(o);

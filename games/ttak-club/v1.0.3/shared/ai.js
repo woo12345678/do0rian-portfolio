@@ -75,17 +75,18 @@
     return Math.hypot(p.x-(a.x+dx*t),p.y-(a.y+dy*t));
   }
   function golfShot(g,disc,profile,random){
-    const cup=g.board.cup,rocks=(g.board.rocks||[]).filter(rock=>segmentDistance(disc,cup,rock)<rock.r+disc.radius+12);
-    let target=cup;
+    const cup=g.board.cup,route=g.board.fairwayPath||[cup],nearest=route.reduce((best,point,index)=>distance(disc,point)<best.distance?{index,distance:distance(disc,point)}:best,{index:0,distance:Infinity});
+    let routeIndex=Math.min(route.length-1,nearest.index+1);while(routeIndex<route.length-1&&distance(disc,route[routeIndex])<520)routeIndex++;
+    let target=distance(disc,cup)<650?cup:route[routeIndex],rocks=(g.board.rocks||[]).filter(rock=>segmentDistance(disc,target,rock)<rock.r+disc.radius+12),detouring=rocks.length>0;
     if(rocks.length){
       const rock=rocks.sort((a,b)=>distance(disc,a)-distance(disc,b))[0];
-      const dx=cup.x-disc.x,dy=cup.y-disc.y,length=Math.hypot(dx,dy)||1;
+      const dx=target.x-disc.x,dy=target.y-disc.y,length=Math.hypot(dx,dy)||1;
       const px=-dy/length,py=dx/length,clearance=rock.r+disc.radius+34;
       const options=[-1,1].map(side=>({x:rock.x+px*clearance*side,y:rock.y+py*clearance*side}));
       target=options.filter(p=>p.x>disc.radius&&p.x<g.board.width-disc.radius&&p.y>disc.radius&&p.y<g.board.height-disc.radius)
-        .sort((a,b)=>(distance(disc,a)+distance(a,cup))-(distance(disc,b)+distance(b,cup)))[0]||options[0];
+        .sort((a,b)=>(distance(disc,a)+distance(a,route[routeIndex]))-(distance(disc,b)+distance(b,route[routeIndex])))[0]||options[0];
     }
-    const power=Math.min(1375,Math.max(780,distance(disc,target)*1.65));
+    const targetDistance=distance(disc,target),putting=target===cup,power=putting?Math.min(680,Math.max(120,targetDistance*1.7)):detouring?Math.min(760,Math.max(180,targetDistance*1.65)):Math.min(1375,Math.max(780,targetDistance*1.65));
     return shotToward(disc,target,power,{...profile,jitter:profile.jitter*.45},random);
   }
   function coopPlan(g,legal){

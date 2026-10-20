@@ -8,7 +8,7 @@ assert.ok(index.indexOf('./shared/haptics.js')<index.indexOf('./js/app.js'),'hap
 assert.match(app,/TtakHaptics\.create\(window\)/);
 assert.match(app,/haptics\.trigger\('impact',e\.strength\)/);
 assert.match(app,/haptics\.trigger\(e\.type==='pocket'\?'cup':e\.type\)/);
-assert.match(app,/\['out','cup','goal','target','pocket'\]/);
+assert.match(app,/\['out','cup','water','goal','target','pocket'\]/);
 assert.match(app,/haptics\.trigger\('line'\)/);
 assert.match(sw,/\.\/shared\/haptics\.js/);
 const cache=/const CACHE='([^']+)'/.exec(sw)?.[1];

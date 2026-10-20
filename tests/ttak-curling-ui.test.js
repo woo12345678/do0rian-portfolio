@@ -7,7 +7,7 @@ const html = fs.readFileSync(`${base}/index.html`, 'utf8');
 const sw = fs.readFileSync(`${base}/sw.js`, 'utf8');
 const css = fs.readFileSync(`${base}/css/style.css`, 'utf8');
 
-assert.match(sw, /ttak-static-v1\.0\.3-curling-scorecard-18/, 'Curling scorecard update invalidates the offline cache');
+assert.match(sw,/ttak-static-v1\.0\.3-golf-tour-19/,'latest gameplay update invalidates the offline cache');
 assert.match(app, /curling:\{name:'라이트 컬링'/, 'Korean mode card exists');
 assert.match(app, /curling:\{name:'Light Curling'/, 'English mode card exists');
 assert.match(app, /아홉 가지 손맛/);
