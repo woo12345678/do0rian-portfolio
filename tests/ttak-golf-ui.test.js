@@ -34,6 +34,6 @@ assert.match(css,/\.golf-minimap\.compact/,'minimap has a compact fallback when 
 assert.match(css,/@keyframes map-settle/,'dock changes use a restrained settle animation instead of sliding across play');
 assert.match(css,/\.canvaswrap #board\{width:auto/,'compact landscape sizing only targets the game board');
 assert.doesNotMatch(css,/\.canvaswrap canvas\{width:auto/,'minimap must not inherit full-height compact board sizing');
-assert.match(sw,/ttak-static-v1\.0\.3-golf-map-avoid-20/,'adaptive minimap update invalidates the offline cache');
+assert.match(sw,/ttak-static-v1\.0\.3-football-arenas-21/,'adaptive minimap update invalidates the offline cache');
 
 console.log('ttak golf UI tests passed');

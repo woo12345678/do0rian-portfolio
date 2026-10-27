@@ -18,6 +18,19 @@
     pool:{playfield:{x:150,y:40,w:900,h:640},pockets:[{x:150,y:40,r:35},{x:600,y:40,r:32},{x:1050,y:40,r:35},{x:150,y:680,r:35},{x:600,y:680,r:32},{x:1050,y:680,r:35}]},
     curling:{playfield:{x:40,y:160,w:1120,h:400},house:{center:{x:1020,y:360},radius:100},hogLineX:620,backLineX:1135,hack:{x:230,y:360}}
   });
+  const FOOTBALL_ARENAS=deepFreeze({
+    classic:{bumpers:[],obstacles:[]},
+    spring:{bumpers:[
+      {id:'spring-left',x:470,y:300,radius:42,boost:1.3},
+      {id:'spring-right',x:730,y:420,radius:42,boost:1.3}
+    ],obstacles:[]},
+    fortress:{bumpers:[],obstacles:[
+      {id:'wall-top-left',x:360,y:230,w:160,h:24},
+      {id:'wall-top-right',x:680,y:230,w:160,h:24},
+      {id:'wall-bottom-left',x:360,y:466,w:160,h:24},
+      {id:'wall-bottom-right',x:680,y:466,w:160,h:24}
+    ]}
+  });
   const LINE_LAYOUTS=deepFreeze([
     {id:'h-close',kind:'horizontal',a:{x:70,y:410},b:{x:1130,y:410},spawns:[{x:520,y:630},{x:680,y:630}]},
     {id:'h-far',kind:'horizontal',a:{x:70,y:90},b:{x:1130,y:90},spawns:[{x:500,y:630},{x:700,y:630}]},
@@ -122,7 +135,7 @@
     const firstTurn=s.firstPlayer==='ai'?Math.min(1,players-1):s.firstPlayer==='random'?Math.min(players-1,Math.floor(Math.max(0,Math.min(.999999,Number((typeof opts.rng==='function'?opts.rng:Math.random)())||0))*players)):0;
     const g={mode,players,settings,phase:'aiming',turn:firstTurn,round:1,shot:0,winner:null,scores:Array(players).fill(0),objects:[],board:{width:W,height:H,walls:false,orientation:'vertical'},events:[]};
     if(mode==='classic'){g.board.geometry=FIELD_GEOMETRY.classic;g.board.playfield=FIELD_GEOMETRY.classic.frame;g.board.surface='baduk';g.objects=classicPieces(Math.max(1,Math.min(20,s.discs||5)),settings.formation,players);}
-    if(mode==='football'){const discs=Number(s.discs)===5?5:3,geometry=discs===5?FIELD_GEOMETRY.footballLarge:FIELD_GEOMETRY.football;settings.discs=discs;g.board.walls=true;g.board.geometry=geometry;g.board.playfield=geometry.touchline;g.board.goals={...geometry.goals};g.board.surface='grass';g.objects=verticalRows(players,discs,23,geometry);g.objects.push(P.body({id:'ball',kind:'ball',x:600,y:360,radius:20,mass:.65}));}
+    if(mode==='football'){const discs=Number(s.discs)===5?5:3,geometry=discs===5?FIELD_GEOMETRY.footballLarge:FIELD_GEOMETRY.football,arenaIds=Object.keys(FOOTBALL_ARENAS),requestedArena=s.footballArena==='random'?'random':Object.hasOwn(FOOTBALL_ARENAS,s.footballArena)?s.footballArena:'classic',roll=Math.max(0,Math.min(.999999,Number((typeof opts.rng==='function'?opts.rng:Math.random)())||0)),arena=requestedArena==='random'?arenaIds[Math.floor(roll*arenaIds.length)]:requestedArena,layout=FOOTBALL_ARENAS[arena];settings.discs=discs;settings.footballArena=arena;settings.footballArenaRequest=requestedArena;g.board.walls=true;g.board.geometry=geometry;g.board.playfield=geometry.touchline;g.board.goals={...geometry.goals};g.board.surface='grass';g.board.bumpers=layout.bumpers.map(item=>({...item}));g.board.obstacles=layout.obstacles.map(item=>({...item}));g.objects=verticalRows(players,discs,23,geometry);g.objects.push(P.body({id:'ball',kind:'ball',x:600,y:360,radius:20,mass:.65}));}
     if(mode==='pool'){const geometry=FIELD_GEOMETRY.pool;g.board.walls=true;g.board.surface='pool';g.board.geometry=geometry;g.board.playfield=geometry.playfield;g.board.pockets=geometry.pockets;g.board.friction=.55;g.board.restitution=.9;g.poolGroups=[null,null];g.objects=poolPieces();}
     if(mode==='curling'){const geometry=FIELD_GEOMETRY.curling;g.board={width:W,height:H,walls:false,orientation:'horizontal',surface:'ice',geometry,playfield:geometry.playfield,house:geometry.house,friction:1.65,restitution:.84};g.end=1;g.extraEnds=0;g.throwsInEnd=0;g.endHistory=[];g.endFirstTeam=firstTurn;setupCurlingEnd(g,firstTurn);}
     if(mode==='line'){const layout=chooseLineLayout(opts.rng,s.lineLayout),safeSign=Math.sign(lineCross(layout,layout.spawns[0]))||1,spawns=lineSpawnPoints(layout,players);g.board={width:W,height:H,walls:true,orientation:'vertical',targetLine:{id:layout.id,kind:layout.kind,a:{...layout.a},b:{...layout.b},safeSign}};g.throws=1;g.attempts=Array.from({length:players},()=>[]);g.objects=spawns.map((spawn,t)=>disc(t,spawn.x,spawn.y));}
@@ -210,5 +223,5 @@
     const outcome=cooperative?(g.winner==null?'defeat':'victory'):solo?(g.winner==null?'defeat':'victory'):g.winner==null?'draw':'competitive-win';
     return {mode:g.mode,outcome,winner:g.winner,defeated:g.winner==null?[]:Array.from({length:g.players},(_,i)=>i).filter(i=>i!==g.winner)};
   }
-  return {MODES:['classic','football','line','golf','coop','royal','chain','pool','curling'],FORMATIONS,FIELD_GEOMETRY,LINE_LAYOUTS,lineMeasure,lineTarget,curlingScore,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
+  return {MODES:['classic','football','line','golf','coop','royal','chain','pool','curling'],FORMATIONS,FIELD_GEOMETRY,FOOTBALL_ARENAS,LINE_LAYOUTS,lineMeasure,lineTarget,curlingScore,formationPoints,HOLES,setupHole,createGame,eligibleObjects,markShot,beginGoblinCounter,resolve,adjudicate};
 });

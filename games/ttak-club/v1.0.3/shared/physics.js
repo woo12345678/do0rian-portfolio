@@ -32,6 +32,24 @@
       if(cue&&object)events.push({type:'cue-hit',id:object.id,number:object.number});
     }
   }
+  function reflectStatic(o,nx,ny,restitution,boost=1){
+    const incoming=o.vx*nx+o.vy*ny;if(incoming>=0)return 0;
+    o.vx=(o.vx-(1+restitution)*incoming*nx)*boost;o.vy=(o.vy-(1+restitution)*incoming*ny)*boost;
+    const speed=Math.hypot(o.vx,o.vy);if(speed>MAX_SPEED){o.vx=o.vx/speed*MAX_SPEED;o.vy=o.vy/speed*MAX_SPEED;}
+    return Math.abs(incoming);
+  }
+  function collideBumper(o,bumper,emit,restitution){
+    let dx=o.x-bumper.x,dy=o.y-bumper.y,distance=Math.hypot(dx,dy),minimum=o.radius+bumper.radius;if(distance>=minimum)return;
+    let nx,ny;if(distance>1e-6){nx=dx/distance;ny=dy/distance;}else{const speed=Math.hypot(o.vx,o.vy)||1;nx=-o.vx/speed;ny=-o.vy/speed;distance=0;}
+    o.x=bumper.x+nx*minimum;o.y=bumper.y+ny*minimum;const strength=reflectStatic(o,nx,ny,restitution,bumper.boost||1.3);
+    if(strength)emit({type:'bumper',id:bumper.id,team:o.team,x:bumper.x,y:bumper.y,strength});
+  }
+  function collideObstacle(o,wall,emit,restitution){
+    const closestX=Math.max(wall.x,Math.min(o.x,wall.x+wall.w)),closestY=Math.max(wall.y,Math.min(o.y,wall.y+wall.h)),dx=o.x-closestX,dy=o.y-closestY,distance=Math.hypot(dx,dy);if(distance>=o.radius)return;
+    let nx,ny;if(distance>1e-6){nx=dx/distance;ny=dy/distance;o.x=closestX+nx*o.radius;o.y=closestY+ny*o.radius;}else{const sides=[{d:o.x-wall.x,nx:-1,ny:0,x:wall.x-o.radius,y:o.y},{d:wall.x+wall.w-o.x,nx:1,ny:0,x:wall.x+wall.w+o.radius,y:o.y},{d:o.y-wall.y,nx:0,ny:-1,x:o.x,y:wall.y-o.radius},{d:wall.y+wall.h-o.y,nx:0,ny:1,x:o.x,y:wall.y+wall.h+o.radius}].sort((a,b)=>a.d-b.d)[0];({nx,ny}=sides);o.x=sides.x;o.y=sides.y;}
+    const strength=reflectStatic(o,nx,ny,restitution);if(strength)emit({type:'obstacle',id:wall.id,team:o.team,x:o.x,y:o.y,strength});
+  }
+  function collideArena(o,board,emit,restitution){for(const bumper of board.bumpers||[])collideBumper(o,bumper,emit,restitution);for(const wall of board.obstacles||[])collideObstacle(o,wall,emit,restitution);}
   function step(objects, dt, board) {
     const events = [], walls = board.walls !== false, open = board.openEdges || {}, inset = board.inset || 0, restitution=board.restitution??RESTITUTION;
     const bounds = board.playfield || {x:inset,y:inset,w:board.width-inset*2,h:board.height-inset*2};
@@ -72,11 +90,11 @@
       const decay = Math.exp(-(o.friction ?? (inBunker ? 6.2 : inRough ? 4.2 : inFairway ? board.fairwayFriction : board.friction) ?? DEFAULT_FRICTION) * dt);
       o.vx *= decay; o.vy *= decay;
       if (Math.hypot(o.vx, o.vy) < REST_SPEED) o.vx = o.vy = 0;
-      constrain(o);
+      constrain(o);collideArena(o,board,emit,restitution);
     }
     const active = objects.filter(o => o.active);
     for (let i = 0; i < active.length; i++) for (let j = i + 1; j < active.length; j++) collide(active[i], active[j], events, restitution);
-    for (const o of objects) constrain(o);
+    for (const o of objects){constrain(o);collideArena(o,board,emit,restitution);}
     return events;
   }
   const allResting = objects => objects.filter(o => o.active).every(o => Math.hypot(o.vx, o.vy) < REST_SPEED);
