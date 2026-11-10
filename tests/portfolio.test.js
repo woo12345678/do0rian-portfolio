@@ -2,13 +2,14 @@ const assert = require('assert');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 const { execFileSync } = require('child_process');
 const root = path.join(__dirname, '..');
 const projects = require('../projects.js');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
 
-assert.strictEqual(projects.length, 31, '포트폴리오에는 현재 31개 프로젝트가 있어야 합니다.');
+assert.strictEqual(projects.length, 37, '포트폴리오에는 현재 37개 프로젝트가 있어야 합니다.');
 assert.strictEqual(new Set(projects.map(p => p.id)).size, projects.length, '프로젝트 ID는 고유해야 합니다.');
 projects.forEach(project => {
   ['id', 'title', 'url', 'image', 'kind', 'summary'].forEach(key => assert(project[key], `${project.id || 'project'}: ${key} 필드가 필요합니다.`));
@@ -52,7 +53,35 @@ const stitchkeeper = projects.find(p => p.id === 'stitchkeeper');
 const gulpGoal = projects.find(p => p.id === 'gulp-goal');
 const stitchkeeperInventorySha256 = '47c8ba506d16065e29cf1b3b247c3bb86d6ad4c02040de121c79c326a49f2860';
 assert.deepStrictEqual(projects.slice(4, 10).map(p => p.id), ['realdrive-horizon', 'ttak-club', 'echo-front', 'vault-click', 'stitchkeeper', 'gulp-goal'], '기존 게임 순서를 보존해야 합니다.');
-assert.notStrictEqual(projects[10].kind, 'game', 'GULP! GOAL! MAYHEM은 비게임 프로젝트 바로 앞에 있어야 합니다.');
+assert.notStrictEqual(projects[16].kind, 'game', '새 게임 6종은 기존 게임 뒤, 비게임 프로젝트 앞에 있어야 합니다.');
+
+const addedGames = [
+  ['emberhaul', 'EMBERHAUL: The Deep Runs', 'emberhaul.html', 'assets/projects/emberhaul-gameplay.png', /LOCAL BROWSER BUILD/, /PUBLIC DOWNLOAD NOT AVAILABLE/],
+  ['monstermate', 'MonsterMate 2.0', 'monstermate.html', 'assets/projects/monstermate-card.svg', /WINDOWS.*ELECTRON.*DESKTOP COMPANION/, /PUBLIC DOWNLOAD NOT AVAILABLE/],
+  ['nightfall-exit-protocol', 'NIGHTFALL: EXIT PROTOCOL', 'nightfall-exit-protocol.html', 'assets/projects/nightfall-exit-protocol-card.svg', /LOCAL BUILD.*RELEASE HOLD/, /RELEASE HOLD.*ENTITLEMENT GATE/],
+  ['boss-monster-arena', 'Boss Monster Arena', 'boss-monster-arena.html', 'assets/projects/boss-monster-arena-card.svg', /PROTOTYPE.*RELEASE HOLD/, /PUBLIC DOWNLOAD NOT AVAILABLE.*RELEASE HOLD/],
+  ['moonloom', 'MOONLOOM — 달빛 직조 공방', 'moonloom.html', 'assets/projects/moonloom-concept-card.svg', /DESKTOP COMPANION/, /PUBLIC DOWNLOAD NOT AVAILABLE/],
+  ['tiny-touchline', 'TINY TOUCHLINE — 꼬마구단', 'tiny-touchline.html', 'assets/projects/tiny-touchline-match.png', /DESKTOP COMPANION/, /PUBLIC DOWNLOAD NOT AVAILABLE/]
+];
+assert.deepStrictEqual(projects.slice(10, 16).map(project => project.id), addedGames.map(([id]) => id));
+addedGames.forEach(([id, title, detailFile, image, platform, status]) => {
+  const project = projects.find(item => item.id === id);
+  assert(project, `${id}: 공개 카드가 필요합니다.`);
+  assert.strictEqual(project.title, title);
+  assert.strictEqual(project.url, detailFile);
+  assert.strictEqual(project.image, image);
+  assert.strictEqual(project.kind, 'game');
+  assert(platform.test(project.platform), `${id}: 실제 플랫폼/상태가 카드에 필요합니다.`);
+  assert(!project.playUrl && !project.liveUrl && !project.sourceUrl, `${id}: 확인되지 않은 실행·다운로드 링크를 노출하면 안 됩니다.`);
+  const detail = fs.readFileSync(path.join(root, detailFile), 'utf8');
+  assert(detail.includes('href="./"') && detail.includes('포트폴리오로 돌아가기'));
+  assert(detail.includes(image) && fs.existsSync(path.join(root, image)));
+  assert(detail.includes('<a href="https://do0rian.itch.io/">itch.io 전체 작품</a>'), `${id}: verified author profile link and non-game-specific label are required.`);
+  assert(status.test(detail), `${id}: 공개 불가 또는 보류 상태가 상세 페이지에 명확해야 합니다.`);
+  assert(!/href=["'][^"']*(?:\.exe|\.zip|download)/i.test(detail), `${id}: 바이너리/다운로드 링크를 만들면 안 됩니다.`);
+});
+const publicText = `${JSON.stringify(projects)}\n${addedGames.map(([, , file]) => fs.readFileSync(path.join(root, file), 'utf8')).join('\n')}`;
+assert(!publicText.includes('두근두근 한판'), '제외 요청한 두근두근 한판은 공개 목록과 상세 페이지에 없어야 합니다.');
 [
   [ttakClub, 'games/ttak-club/v1.0.3/', 'assets/projects/ttak-club-home.png', /7 Modes/, /119\/119/],
   [echoFront, 'https://woo12345678.github.io/do0rian-portfolio/echo-front.html', 'assets/projects/echo-front.png', /52 Heroes.*9 Modes.*11 Maps/, /96\/96/]
@@ -337,6 +366,7 @@ const ttakReleaseFiles = [
   'shared/ai.js',
   'shared/feedback.js',
   'shared/haptics.js',
+  'shared/overlay-layout.js',
   'shared/physics.js',
   'shared/rules.js',
   'sw.js'
@@ -350,6 +380,8 @@ function listFiles(dir, base = dir) {
 assert(fs.existsSync(ttakReleaseDir), `${ttakReleaseRelative}: 공개 릴리스 디렉터리가 필요합니다.`);
 assert.deepStrictEqual(listFiles(ttakReleaseDir).sort(), ttakReleaseFiles);
 const ttakBuildInfo = JSON.parse(fs.readFileSync(path.join(ttakReleaseDir, 'build-info.json'), 'utf8'));
+// Preserve and identify the loose legacy metadata record, but do not use its stale
+// source/inventory fields to describe the web runtime or the separately packed ZIP.
 assert.deepStrictEqual(ttakBuildInfo, {
   version: '1.0.3',
   sourceSha: '524957c590aa9058a451fce110661b00f821789d',
@@ -359,14 +391,75 @@ assert.deepStrictEqual(ttakBuildInfo, {
   inventorySha256: 'e93db3b63f7b4e2a9b9582bb0e217cb6ebaa1cc5b6542308e3bbfcee25f32b23'
 });
 const ttakRuntimeFiles = ttakReleaseFiles.filter(file => file !== 'build-info.json' && !file.endsWith('.zip')).sort();
+function canonicalizeCrlfOnly(bytes, label) {
+  const chunks = [];
+  let start = 0;
+  for (let index = 0; index < bytes.length; index++) {
+    if (bytes[index] !== 0x0d) continue;
+    assert.strictEqual(bytes[index + 1], 0x0a, `${label} contains a lone CR byte`);
+    chunks.push(bytes.subarray(start, index), Buffer.from('\n'));
+    start = index + 2;
+    index++;
+  }
+  chunks.push(bytes.subarray(start));
+  return Buffer.concat(chunks);
+}
+assert.throws(
+  () => canonicalizeCrlfOnly(Buffer.from('safe\rmutation\n'), 'in-memory mutation probe'),
+  /lone CR byte/,
+  'TTAK canonicalization must fail closed when a lone CR is inserted'
+);
 const ttakInventory = crypto.createHash('sha256').update(ttakRuntimeFiles.map(file => {
-  const releaseBytes = fs.readFileSync(path.join(ttakReleaseDir, file), 'utf8').split(String.fromCharCode(13)).join('');
+  const releaseBytes = canonicalizeCrlfOnly(fs.readFileSync(path.join(ttakReleaseDir, file)), `TTAK worktree ${file}`);
   const fileSha = crypto.createHash('sha256').update(releaseBytes).digest('hex');
   return `${fileSha}  ${file}\n`;
 }).join('')).digest('hex');
-assert.strictEqual(ttakInventory, ttakBuildInfo.inventorySha256, 'deployed TTAK runtime files must match the verified inventory');
+assert.strictEqual(ttakInventory, '7b5e824b05f5dd26ed412103ff77717b2a8c56cec0994d15205bcb2faeef4adb', 'deployed TTAK web runtime must match the independently pinned 2f0cf9c inventory');
+const ttakWebCommit = '2f0cf9c54a16f93cf50154d15aa527a7db3c6d21';
+const ttakWebBlobs = {
+  'css/pigments.css':'deb780a6dc34a64247a02f78251659d79d3d3556','css/style.css':'9b54279d33d0c925cc6e312e6762792c452961fe','icon.svg':'14988498b88aa45dbcb4a0d9b159c43dd50fac40','index.html':'fbc4fc193a6d1ea5edeff8a241ed6c3a807ee149','js/app.js':'3437a27a4224dcbd171e78dfee4bd6ae9105199a','js/guide-locales.js':'5107437c848adb3c181e11d8a239adf1e40b1cf4','manifest.webmanifest':'e4fa986ac4ee59259dffbb634cf69a76f08f34ba','shared/ai.js':'dc380720f0ec72f35c13f951c897f9de2155bad8','shared/feedback.js':'d33df854740d2e877312fc9d714d326646d74c99','shared/haptics.js':'0f9412ee8fa62fdcc542c96633ccb84e988c83ae','shared/overlay-layout.js':'c0e17d4079882138a45c313fc3beba1150254be9','shared/physics.js':'2cb56862c713439763576bd536c6e83a6085c820','shared/rules.js':'349f49d66c8f4c2b438c4c22e64122bf031f99f2','sw.js':'881487a1a1eddfb1d78a959a6ac685661d63a791'
+};
+assert.strictEqual(execFileSync('git', ['rev-parse', '2f0cf9c^{commit}'], { cwd: root, encoding: 'utf8' }).trim(), ttakWebCommit);
+Object.entries(ttakWebBlobs).forEach(([file, expected]) => {
+  const commitBytes = execFileSync('git', ['show', `${ttakWebCommit}:games/ttak-club/v1.0.3/${file}`], { cwd: root, encoding: 'buffer' });
+  const blob = crypto.createHash('sha1').update(Buffer.concat([Buffer.from(`blob ${commitBytes.length}\0`), commitBytes])).digest('hex');
+  assert.strictEqual(blob, expected, `TTAK ${file} pinned blob SHA must match commit ${ttakWebCommit}`);
+  const worktreeBytes = canonicalizeCrlfOnly(fs.readFileSync(path.join(ttakReleaseDir, file)), `TTAK worktree ${file}`);
+  assert.deepStrictEqual(worktreeBytes, commitBytes, `TTAK ${file} worktree must equal the named commit after CRLF-only checkout normalization`);
+});
 const ttakZip = fs.readFileSync(path.join(ttakReleaseDir, 'TTAK-Table-Club-v1.0.3-itch.zip'));
 assert.strictEqual(crypto.createHash('sha256').update(ttakZip).digest('hex'), '051c88475bdc072d8ad2ab61013e505436416d407af843763ce3a5447a16d6bd');
+function readZipFiles(zip) {
+  const end = zip.lastIndexOf(Buffer.from([0x50,0x4b,0x05,0x06]));
+  assert(end >= 0, 'TTAK ZIP needs an end-of-central-directory record');
+  const count = zip.readUInt16LE(end + 10), central = zip.readUInt32LE(end + 16), files = new Map();
+  let offset = central;
+  for (let index = 0; index < count; index++) {
+    assert.strictEqual(zip.readUInt32LE(offset), 0x02014b50, 'TTAK ZIP central directory must be valid');
+    const method = zip.readUInt16LE(offset + 10), size = zip.readUInt32LE(offset + 20), nameLength = zip.readUInt16LE(offset + 28), extraLength = zip.readUInt16LE(offset + 30), commentLength = zip.readUInt16LE(offset + 32), local = zip.readUInt32LE(offset + 42);
+    const name = zip.subarray(offset + 46, offset + 46 + nameLength).toString('utf8');
+    const localNameLength = zip.readUInt16LE(local + 26), localExtraLength = zip.readUInt16LE(local + 28), start = local + 30 + localNameLength + localExtraLength;
+    const packed = zip.subarray(start, start + size);
+    assert(method === 0 || method === 8, `unsupported ZIP compression method for ${name}`);
+    if (!name.endsWith('/')) files.set(name, method === 8 ? zlib.inflateRawSync(packed) : packed);
+    offset += 46 + nameLength + extraLength + commentLength;
+  }
+  return files;
+}
+const ttakZipFiles = readZipFiles(ttakZip);
+const ttakZipInfo = JSON.parse(ttakZipFiles.get('build-info.json').toString('utf8'));
+assert.strictEqual(ttakZipInfo.sourceSha, '6fa828c92869532b1dac99e7b6e6373e28da64cd', 'ZIP preserves its historical source origin');
+assert.strictEqual(execFileSync('git', ['cat-file', '-t', ttakZipInfo.sourceSha], { cwd: root, encoding: 'utf8' }).trim(), 'commit');
+const ttakZipRuntime = [...ttakZipFiles.keys()].filter(file => file !== 'build-info.json').sort();
+const ttakZipInventory = crypto.createHash('sha256').update(ttakZipRuntime.map(file => {
+  const archived = ttakZipFiles.get(file);
+  const bytes = /\.(?:css|html|js|json|svg|webmanifest)$/i.test(file)
+    ? canonicalizeCrlfOnly(archived, `TTAK ZIP ${file}`)
+    : archived;
+  return `${crypto.createHash('sha256').update(bytes).digest('hex')}  ${file}\n`;
+}).join('')).digest('hex');
+assert.strictEqual(ttakZipInventory, ttakZipInfo.inventorySha256);
+assert.strictEqual(ttakZipInventory, '6121c8847d2958dd73961bfceecf9db562f00c04085561e100975044a9b5b705', 'ZIP inventory must remain independently pinned');
 const ttakReleaseIndex = fs.readFileSync(path.join(ttakReleaseDir, 'index.html'), 'utf8');
 ['./manifest.webmanifest', './css/style.css', './css/pigments.css', './shared/physics.js', './shared/rules.js', './shared/ai.js', './shared/feedback.js', './shared/haptics.js', './js/guide-locales.js', './js/app.js']
   .forEach(asset => assert(ttakReleaseIndex.includes(asset), `TTAK release index must use relative asset ${asset}`));

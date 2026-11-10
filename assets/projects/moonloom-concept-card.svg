@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">MOONLOOM concept card</title>
+  <desc id="desc">A self-authored text card describing the focus timer, weaving, cocoon, and moth collection loop. This is not a gameplay screenshot.</desc>
+  <rect width="1280" height="720" fill="#090b14"/>
+  <circle cx="1060" cy="112" r="210" fill="#c8b8ff" opacity=".13"/>
+  <path d="M0 600 Q320 520 640 605 T1280 585 V720 H0Z" fill="#151328"/>
+  <g fill="none" stroke="#9c8bd8" opacity=".32"><path d="M760 170v390M850 170v390M940 170v390"/><path d="M700 235h300M700 325h300M700 415h300M700 505h300"/></g>
+  <g font-family="Arial, sans-serif">
+    <text x="92" y="100" fill="#bcaaff" font-size="20" letter-spacing="7">DESIGN CONCEPT · NOT A GAMEPLAY CAPTURE</text>
+    <text x="88" y="250" fill="#f3efff" font-size="106" font-weight="700" letter-spacing="-5">MOONLOOM</text>
+    <text x="96" y="312" fill="#d8cff7" font-size="34">달빛 직조 공방</text>
+    <text x="96" y="420" fill="#8f86ad" font-size="24">FOCUS TIMER</text><text x="300" y="420" fill="#5b5472" font-size="24">→</text>
+    <text x="340" y="420" fill="#8f86ad" font-size="24">WEAVE</text><text x="470" y="420" fill="#5b5472" font-size="24">→</text>
+    <text x="510" y="420" fill="#8f86ad" font-size="24">COCOON</text>
+    <text x="96" y="500" fill="#f3efff" font-size="28">12 moths · local JSON · 560 × 260 window</text>
+    <text x="96" y="610" fill="#6f6886" font-size="18" letter-spacing="3">SELF-AUTHORED PORTFOLIO EXPLAINER</text>
+  </g>
+</svg>

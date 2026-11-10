@@ -150,6 +150,54 @@
       tags: ['Eat-to-Shoot Loop', 'Next Shot Growth', 'Crowd Volley', 'Canvas 2D', 'Web Audio', 'Deterministic']
     },
     {
+      id: 'emberhaul', title: 'EMBERHAUL: The Deep Runs', url: 'emberhaul.html', image: 'assets/projects/emberhaul-gameplay.png', kind: 'game',
+      platform: 'LOCAL BROWSER BUILD · THREE.JS · WINDOWS LAUNCHER',
+      summary: '산업용 크롤러로 결정론적 계약을 내려가 광맥을 채굴하고, 화물과 탄약을 같은 자원으로 운용한 뒤 할당량을 채워 탈출하는 추출 액션 캠페인.',
+      impact: '32 Contracts · 7 Regions · 6 Boss Encounters · Local Build',
+      role: '게임·캠페인 기획 · Three.js 절차 비주얼 · 전투/채굴 경제 · 한영 UX · 저장/릴리스 QA', collaboration: true,
+      tags: ['Extraction Action', 'Three.js', 'Deterministic', 'Korean/English', 'Local Build']
+    },
+    {
+      id: 'monstermate', title: 'MonsterMate 2.0', url: 'monstermate.html', image: 'assets/projects/monstermate-card.svg', kind: 'game',
+      platform: 'WINDOWS · ELECTRON · DESKTOP COMPANION',
+      summary: '키 입력과 클릭의 내용이 아닌 횟수로 오리지널 몬스터를 성장시키고 꾸미는 투명 Windows 데스크톱 오버레이.',
+      impact: '6 Species · 12 Adult Evolutions · 36 Cosmetics · Local App',
+      role: '제품·성장 시스템 기획 · Electron 오버레이 · 로컬 저장 · 선택형 친구 모드 · 보안 경계', collaboration: true,
+      tags: ['Desktop Companion', 'Electron', 'Collection', 'Privacy', 'Windows']
+    },
+    {
+      id: 'nightfall-exit-protocol', title: 'NIGHTFALL: EXIT PROTOCOL', url: 'nightfall-exit-protocol.html', image: 'assets/projects/nightfall-exit-protocol-card.svg', kind: 'game',
+      platform: 'WINDOWS · UNITY 6 · LOCAL BUILD · RELEASE HOLD',
+      summary: '세 동료와 야간 시설의 릴레이를 복구하고 40초 동안 추출 비콘을 방어하는 싱글플레이 분대 FPS 프로토타입.',
+      impact: '3 Relays · 3 AI Squadmates · 40-Second Extraction · Entitlement Gate',
+      role: 'FPS 시스템·목표 설계 · 분대 AI · 절차 시설 · Windows 빌드/자동 QA', collaboration: true,
+      tags: ['Squad FPS', 'Unity 6', 'Extraction', 'Local Build', 'Release Hold']
+    },
+    {
+      id: 'boss-monster-arena', title: 'Boss Monster Arena', url: 'boss-monster-arena.html', image: 'assets/projects/boss-monster-arena-card.svg', kind: 'game',
+      platform: 'WINDOWS · UNITY 6 · PROTOTYPE · RELEASE HOLD',
+      summary: '거대 괴수를 조종해 야생 생태와 사냥꾼의 압박 속에서 이동·비행·근접 콤보·브레스·고유 기술을 운용하는 독립 실행형 아레나 프로토타입.',
+      impact: '3 Boss Roles · Ecology & Hunter Systems · Local Prototype',
+      role: '전투·괴수 컨트롤 기획 · 생태/레이드 시스템 · 런타임 UI · 자동 스모크 검증', collaboration: true,
+      tags: ['Boss Combat', 'Unity 6', 'Ecology', 'Windows', 'Release Hold']
+    },
+    {
+      id: 'moonloom', title: 'MOONLOOM — 달빛 직조 공방', url: 'moonloom.html', image: 'assets/projects/moonloom-concept-card.svg', kind: 'game',
+      platform: 'WINDOWS · UNITY 6 · DESKTOP COMPANION',
+      summary: '선택한 집중 시간 동안 나방 정령이 달실을 짜고, 완성된 고치에서 12종 수집 나방이 태어나는 작은 데스크톱 컴패니언.',
+      impact: '560×260 Overlay · 12 Moths · 1/5/25-Minute Focus · Local Save',
+      role: '제품·수집 루프 기획 · 절차 그래픽 · Windows 투명 창 · 저장/접근성 QA', collaboration: true,
+      tags: ['Desktop Companion', 'Focus Timer', 'Collection', 'Procedural Art', 'Windows']
+    },
+    {
+      id: 'tiny-touchline', title: 'TINY TOUCHLINE — 꼬마구단', url: 'tiny-touchline.html', image: 'assets/projects/tiny-touchline-match.png', kind: 'game',
+      platform: 'WINDOWS · UNITY 6 · DESKTOP COMPANION',
+      summary: '데스크톱 위 여섯 꼬마 선수가 스스로 경기하고, 훈련·스카우트·리그 승격으로 작은 구단을 키우는 자동 축구 컴패니언.',
+      impact: '640×300 Overlay · 6-Player Auto Match · Training & League',
+      role: '자동 경기·성장 기획 · Unity 런타임 도형 비주얼 · 데스크톱 UX · 빌드 검증', collaboration: true,
+      tags: ['Desktop Companion', 'Auto Football', 'Team Growth', 'Unity 6', 'Windows']
+    },
+    {
       id: 'hannun-life-help',
       title: '한눈 생활도움',
       url: 'https://woo12345678.github.io/hannun-life-help/',
